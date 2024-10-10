@@ -3,6 +3,7 @@ package com.unieventos.screens
 import android.content.Context
 import android.provider.ContactsContract.CommonDataKinds.Phone
 import android.util.Patterns
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import com.unieventos.components.FormTextField
 import com.unieventos.R
+import com.unieventos.model.Role
 import com.unieventos.model.User
 import com.unieventos.viewmodel.UsersViewModel
 
@@ -179,7 +181,16 @@ fun SignUpForm(
         Row {
             Button(onClick = {
                 if (isPasswordMatch) {
-
+                    usersViewModel.createUser(User(
+                        cedula = cedula,
+                        name = name,
+                        address = address,
+                        phoneNumber =phoneNumber,
+                        email = email,
+                        password = password,
+                        role = Role.CLIENT
+                    ))
+                    Toast.makeText(context, context.getString(R.string.userCreated), Toast.LENGTH_SHORT).show()
                 }
             }) {
                 Text(text = "Crear Cuenta")
@@ -187,4 +198,5 @@ fun SignUpForm(
         }
     }
 }
+
 
