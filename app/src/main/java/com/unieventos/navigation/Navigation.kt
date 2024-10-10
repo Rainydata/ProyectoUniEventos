@@ -61,34 +61,34 @@ fun Navigation(
                 usersViewModel = usersViewModel
             )
         }
-        composable<RoutScreen.HomeAdmin> {
-            HomeScreen(
-                onNavigationToEditProfile = {
-                    navController.navigate(RoutScreen.HomeAdmin)
-                }
-            )
-        }
-
-        composable<RoutScreen.Home> {
-            HomeScreen(
-                onNavigationToEditProfile = {
-                    navController.navigate(RoutScreen.EditProfile)
-                }
-            )
-        }
+//        composable<RoutScreen.HomeAdmin> {
+//            HomeScreen(
+//                onNavigationToEditProfile = {
+//                    navController.navigate(RoutScreen.HomeAdmin)
+//                }
+//            )
+//        }
+//
+//        composable<RoutScreen.Home> {
+//            HomeScreen(
+//                onNavigationToEditProfile = {
+//                    navController.navigate(RoutScreen.EditProfile)
+//                }
+//            )
+//        }
 
         composable<RoutScreen.EditProfile> {
             EditProfileScreen()
         }
 
-        composable<RoutScreen.Registration>{
-            SignUpScreen(
-                onNavigationBack = {
-                    navController.popBackStack()
-                },
-                usersViewModel = usersViewModel
-            )
-        }
+//        composable<RoutScreen.Registration>{
+//            SignUpScreen(
+//                onNavigationBack = {
+//                    navController.popBackStack()
+//                },
+//                usersViewModel = usersViewModel
+//            )
+//        }
 
         composable<RoutScreen.Recover>{
             RecoverPassScreen(
