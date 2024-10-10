@@ -15,9 +15,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.unieventos.model.Event
+import dev.chrisbanes.haze.HazeDefaults
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.haze
+import dev.chrisbanes.haze.hazeChild
 
 
 @Composable
@@ -26,34 +32,52 @@ fun HomeScreen(
     onNavigationToEventDetail:(Int) -> Unit
 
 ){
+
+    val hazeState = remember{ HazeState() }
+
     Scaffold(
         topBar = {
-            TopBarHome()
+            TopBarHome(
+                hazeState= hazeState
+            )
         }
     ) {
             paddingValues ->
             EventsList(
                 onNavigationToEventDetail = onNavigationToEventDetail,
-                paddingValues= paddingValues
+                paddingValues= paddingValues,
+                hazeState = hazeState
             )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBarHome(){
-CenterAlignedTopAppBar(title = {
+fun TopBarHome(
+    hazeState: HazeState
+){
+CenterAlignedTopAppBar(
+    modifier = Modifier.hazeChild(state =hazeState),
+    title = {
     Text(text = "UniEventos")
-})
+},
+)
 }
 
 @Composable
 fun EventsList(
     paddingValues : PaddingValues,
-    onNavigationToEventDetail: (Int) -> Unit
+    onNavigationToEventDetail: (Int) -> Unit,
+    hazeState: HazeState
     ){
 
     LazyColumn(
+        modifier = Modifier
+            .haze(
+                state = hazeState,
+                style = HazeDefaults.style(backgroundColor = MaterialTheme.colorScheme.surface)
+            )
+        ,
         contentPadding = paddingValues
     ) {
         items( getEventsList() ){

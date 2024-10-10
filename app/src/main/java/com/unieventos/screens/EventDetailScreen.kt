@@ -28,12 +28,16 @@ import coil.request.ImageRequest
 
 @Composable
 fun EventDetailScreen(
-    eventId: Int
+    eventId: Int,
+    onNavigateBack: () -> Unit
 ){
 
     Scaffold(
         topBar = {
-            TopAppBarDetail()
+            TopAppBarDetail(
+                onNavigateBack = onNavigateBack
+
+            )
 
         }
     ) { padding ->
@@ -65,12 +69,16 @@ fun EventDetailScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBarDetail(){
+fun TopAppBarDetail(
+    onNavigateBack: () -> Unit
+){
 
     TopAppBar(
-        title = { "Event detail" },
+        title = {  
+            Text(text = "Event Detail")
+        },
         navigationIcon = {
-            IconButton(onClick = { /*TODO*/ })
+            IconButton(onClick = onNavigateBack)
             {
             Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
             }

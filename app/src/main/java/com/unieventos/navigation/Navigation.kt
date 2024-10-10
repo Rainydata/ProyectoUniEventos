@@ -115,8 +115,13 @@ fun Navigation(
 
             }
         composable<RouteScreen.EventDetail> {
-            val eventId = it.toRoute<RouteScreen.EventDetail>()
-           EventDetailScreen(eventId = eventId.eventId)
+            val args = it.toRoute<RouteScreen.EventDetail>()
+           EventDetailScreen(
+               eventId = args.eventId,
+               onNavigateBack={
+                   navController.popBackStack()
+               }
+           )
         }
         }
     }
