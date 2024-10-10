@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -69,11 +70,15 @@ Card (
      modifier = Modifier
          .fillMaxWidth()
      ,
-     fontSize = 16.sp,
+     fontSize = MaterialTheme.typography.titleLarge.fontSize,
      fontWeight = FontWeight.Bold,
      textAlign = TextAlign.Center
  )
-     Spacer(modifier = Modifier.height(20.dp))
+
+     HorizontalDivider(
+         modifier = Modifier
+             .fillMaxWidth()
+             .padding(top = 15.dp, bottom = 15.dp),)
 
      Row(
          modifier = Modifier

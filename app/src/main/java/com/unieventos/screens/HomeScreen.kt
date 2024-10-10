@@ -17,9 +17,13 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.unieventos.model.Event
+import com.unieventos.viewmodel.EventsViewModel
 import dev.chrisbanes.haze.HazeDefaults
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.haze
@@ -29,11 +33,13 @@ import dev.chrisbanes.haze.hazeChild
 @Composable
 fun HomeScreen(
     onNavigationToEditProfile: () -> Unit,
-    onNavigationToEventDetail:(Int) -> Unit
+    onNavigationToEventDetail:(Int) -> Unit,
+    eventsViewModel: EventsViewModel
 
 ){
 
     val hazeState = remember{ HazeState() }
+    val events = eventsViewModel.events.collectAsState()
 
     Scaffold(
         topBar = {
@@ -44,6 +50,7 @@ fun HomeScreen(
     ) {
             paddingValues ->
             EventsList(
+                events= events.value,
                 onNavigationToEventDetail = onNavigationToEventDetail,
                 paddingValues= paddingValues,
                 hazeState = hazeState
@@ -57,6 +64,7 @@ fun TopBarHome(
     hazeState: HazeState
 ){
 CenterAlignedTopAppBar(
+    colors = TopAppBarDefaults.largeTopAppBarColors(Color.Transparent),
     modifier = Modifier.hazeChild(state =hazeState),
     title = {
     Text(text = "UniEventos")
@@ -66,6 +74,7 @@ CenterAlignedTopAppBar(
 
 @Composable
 fun EventsList(
+    events: List<Event>,
     paddingValues : PaddingValues,
     onNavigationToEventDetail: (Int) -> Unit,
     hazeState: HazeState
@@ -80,7 +89,7 @@ fun EventsList(
         ,
         contentPadding = paddingValues
     ) {
-        items( getEventsList() ){
+        items( events ){
             event ->
             ItemEvento(
                 event = event,
@@ -90,34 +99,6 @@ fun EventsList(
     }
 }
 
-fun getEventsList(): List<Event>{
-    return listOf(
-        Event(
-            id = 1,
-            place = "Teatro Municipal",
-            title = "Evento1",
-            city = "Medellin",
-            date = "12/05/2023",
-            time = "19:00",
-            category = "Teatro",
-            address = "Calle 1",
-            opening = "19:00",
-            image = "https://loremflickr.com/400/400/theater"
-        ),
-        Event(
-            id = 2,
-            place = "Teatro Departamental",
-            title = "Evento2",
-            city = "Medellin",
-            date = "12/05/2023",
-            time = "19:00",
-            category = "Teatro",
-            address = "Calle 2",
-            opening = "19:00",
-            image = "https://loremflickr.com/400/400/theater"
-        )
-    )
-}
 
 //@Composable
 //fun HomeScreen(

@@ -17,12 +17,14 @@ import com.unieventos.screens.loginScreen
 import com.unieventos.screens.SignUpScreen
 import com.unieventos.screens.RecoverPassScreen
 import com.unieventos.utils.SharedPreferenceUtils
+import com.unieventos.viewmodel.EventsViewModel
 import com.unieventos.viewmodel.UsersViewModel
 
 
 @Composable
 fun Navigation(
-    usersViewModel: UsersViewModel
+    usersViewModel: UsersViewModel,
+    eventsViewModel: EventsViewModel
 ){
     val navController = rememberNavController()
     val context = LocalContext.current
@@ -77,6 +79,7 @@ fun Navigation(
                 onNavigationToEditProfile = {
                     navController.navigate(RouteScreen.EditProfile)
                 },
+                eventsViewModel = eventsViewModel,
                 onNavigationToEventDetail = { eventId ->
                     navController.navigate(RouteScreen.EventDetail(eventId))
                 }
@@ -118,6 +121,7 @@ fun Navigation(
             val args = it.toRoute<RouteScreen.EventDetail>()
            EventDetailScreen(
                eventId = args.eventId,
+               eventsViewModel = eventsViewModel,
                onNavigateBack={
                    navController.popBackStack()
                }
