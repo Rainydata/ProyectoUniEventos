@@ -82,7 +82,7 @@ fun SignUpForm(
             Onvalidate = {
                 cedula.length > 60
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             isPassword = false
         )
 
@@ -126,7 +126,7 @@ fun SignUpForm(
             Onvalidate = {
                 phoneNumber.length != 10
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             isPassword = false
         )
 
@@ -190,6 +190,7 @@ fun SignUpForm(
                         password = password,
                         role = Role.CLIENT
                     ))
+                    onNavigationBack()
                     Toast.makeText(context, context.getString(R.string.userCreated), Toast.LENGTH_SHORT).show()
                 }
             }) {
