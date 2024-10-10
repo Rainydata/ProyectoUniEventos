@@ -27,15 +27,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import com.unieventos.components.FormTextField
 import com.unieventos.R
+import com.unieventos.model.User
+import com.unieventos.viewmodel.UsersViewModel
 
 @Composable
-fun SignUpScreen() {
+fun SignUpScreen(
+    onNavigationBack: () -> Unit,
+    usersViewModel: UsersViewModel
+) {
     val context = LocalContext.current
 
     Scaffold { padding ->
         SignUpForm(
             padding = padding,
-            context = context
+            context = context,
+            onNavigationBack = onNavigationBack,
+            usersViewModel = usersViewModel
         )
     }
 }
@@ -43,15 +50,18 @@ fun SignUpScreen() {
 @Composable
 fun SignUpForm(
     padding: PaddingValues,
-    context: Context
+    context: Context,
+    onNavigationBack: () -> Unit,
+    usersViewModel: UsersViewModel
 ) {
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var passwordConfirm by rememberSaveable { mutableStateOf("") }
+    var cedula by rememberSaveable { mutableStateOf("") }
     var name by rememberSaveable { mutableStateOf("") }
     var address by rememberSaveable { mutableStateOf("") }
     var phoneNumber by rememberSaveable { mutableStateOf("") }
-    var isPasswordMatch by rememberSaveable { mutableStateOf(true) }
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var passwordConfirm by rememberSaveable { mutableStateOf("") }
+   var isPasswordMatch by rememberSaveable { mutableStateOf(true) }
 
     Column(
         modifier = Modifier
@@ -60,6 +70,64 @@ fun SignUpForm(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        FormTextField(
+            value = cedula,
+            onValueChange = {
+                cedula = it
+            },
+            supportingText = stringResource(id = R.string.cedula_validation),
+            label = "Cedula",
+            Onvalidate = {
+                cedula.length > 60
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            isPassword = false
+        )
+
+        FormTextField(
+            value = name,
+            onValueChange = {
+                name = it
+            },
+            supportingText = stringResource(id = R.string.Name_validation),
+            label = "Nombre",
+            Onvalidate = {
+                name.length < 60
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            isPassword = false
+        )
+
+        FormTextField(
+            value = address,
+            onValueChange = {
+                address = it
+            },
+            supportingText = stringResource(id = R.string.address_validation),
+            label = "Dirección",
+            Onvalidate = {
+                address.length < 60
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            isPassword = false
+        )
+
+        FormTextField(
+            value = phoneNumber,
+            onValueChange = {
+                if (it.all { char -> char.isDigit() }) {
+                    phoneNumber = it
+                }
+            },
+            supportingText = stringResource(id = R.string.PhoneNumber_validation),
+            label = "Número",
+            Onvalidate = {
+                phoneNumber.length != 10
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            isPassword = false
+        )
+
         FormTextField(
             value = email,
             onValueChange = {
@@ -108,50 +176,6 @@ fun SignUpForm(
             isPassword = true
         )
 
-        FormTextField(
-            value = name,
-            onValueChange = {
-                name = it
-            },
-            supportingText = stringResource(id = R.string.Name_validation),
-            label = "Nombre",
-            Onvalidate = {
-                name.length < 60
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            isPassword = false
-        )
-
-        FormTextField(
-            value = address,
-            onValueChange = {
-                address = it
-            },
-            supportingText = stringResource(id = R.string.address_validation),
-            label = "Dirección",
-            Onvalidate = {
-                address.length < 60
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            isPassword = false
-        )
-
-        FormTextField(
-            value = phoneNumber,
-            onValueChange = {
-                if (it.all { char -> char.isDigit() }) {
-                    phoneNumber = it
-                }
-            },
-            supportingText = stringResource(id = R.string.PhoneNumber_validation),
-            label = "Número",
-            Onvalidate = {
-                phoneNumber.length != 10
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            isPassword = false
-        )
-
         Row {
             Button(onClick = {
                 if (isPasswordMatch) {
@@ -163,3 +187,4 @@ fun SignUpForm(
         }
     }
 }
+
