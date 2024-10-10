@@ -3,12 +3,14 @@ package com.unieventos.model
 import java.util.Date
 
 data class Event(
-    val lugar: String,
-    val ciudad: String,
-    val fecha: String,
-    val hora: String,
-    val categoria: String,
-    val direccion: String,
-    val Apertura: String,
-    val imagen: String
+    val id: Int,
+    val title: String,
+    val place: String,
+    val city: String,
+    val date: String,
+    val time: String,
+    val category: String,
+    val address: String,
+    val opening: String,
+    val image: String
 )

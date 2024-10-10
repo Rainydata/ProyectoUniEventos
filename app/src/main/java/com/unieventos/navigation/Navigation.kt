@@ -6,8 +6,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.unieventos.model.Role
 import com.unieventos.screens.EditProfileScreen
+import com.unieventos.screens.EventDetailScreen
 import com.unieventos.screens.HomeScreen
 import com.unieventos.screens.RecoverCodeScreen
 import com.unieventos.screens.RecoverNewPassScreen
@@ -24,28 +26,29 @@ fun Navigation(
 ){
     val navController = rememberNavController()
     val context = LocalContext.current
-    var starDestination: RoutScreen = RoutScreen.Login
+//    var startDestination: RouteScreen = RouteScreen.Login
+    var startDestination: RouteScreen = RouteScreen.Home
     val sesion = SharedPreferenceUtils.getCurrentUser(context)
 
     if(sesion != null){
-        starDestination = if(sesion.rol == Role.ADMIN){
-            RoutScreen.Recover
+        startDestination = if(sesion.rol == Role.ADMIN){
+            RouteScreen.Recover
         }else{
-            RoutScreen.Home
+            RouteScreen.Home
         }
     }
 
     NavHost(
         navController = navController,
-        startDestination = starDestination  )
+        startDestination = startDestination  )
     {
-        composable<RoutScreen.Login>{
+        composable<RouteScreen.Login>{
             loginScreen(
                 onNavigationToHome = { role ->
                     val home = if(role == Role.ADMIN){
-                        RoutScreen.HomeAdmin
+                        RouteScreen.HomeAdmin
                     }else{
-                        RoutScreen.Home
+                        RouteScreen.Home
                     }
                     navController.navigate(home){
 
@@ -53,35 +56,38 @@ fun Navigation(
 
                 },
                 onNavigationToSignUp = {
-                    navController.navigate(RoutScreen.Registration)
+                    navController.navigate(RouteScreen.Registration)
                 },
                 onNavigationToRecover = {
-                    navController.navigate(RoutScreen.Recover)
+                    navController.navigate(RouteScreen.Recover)
                 },
                 usersViewModel = usersViewModel
             )
         }
-        composable<RoutScreen.HomeAdmin> {
+//        composable<RouteScreen.HomeAdmin> {
+//            HomeScreen(
+//                onNavigationToEditProfile = {
+//                    navController.navigate(RouteScreen.HomeAdmin)
+//                }
+//            )
+//        }
+
+        composable<RouteScreen.Home> {
             HomeScreen(
                 onNavigationToEditProfile = {
-                    navController.navigate(RoutScreen.HomeAdmin)
+                    navController.navigate(RouteScreen.EditProfile)
+                },
+                onNavigationToEventDetail = { eventId ->
+                    navController.navigate(RouteScreen.EventDetail(eventId))
                 }
             )
         }
 
-        composable<RoutScreen.Home> {
-            HomeScreen(
-                onNavigationToEditProfile = {
-                    navController.navigate(RoutScreen.EditProfile)
-                }
-            )
-        }
-
-        composable<RoutScreen.EditProfile> {
+        composable<RouteScreen.EditProfile> {
             EditProfileScreen()
         }
 
-        composable<RoutScreen.Registration>{
+        composable<RouteScreen.Registration>{
             SignUpScreen(
                 onNavigationBack = {
                     navController.popBackStack()
@@ -90,23 +96,27 @@ fun Navigation(
             )
         }
 
-        composable<RoutScreen.Recover>{
+        composable<RouteScreen.Recover>{
             RecoverPassScreen(
                 onNavigationToCodePass = {
-                    navController.navigate(RoutScreen.RecoverCode)
+                    navController.navigate(RouteScreen.RecoverCode)
                 }
             )
         }
-        composable<RoutScreen.RecoverCode> {
+        composable<RouteScreen.RecoverCode> {
             RecoverCodeScreen(onNavigationToRecoverCofirmCode = {
-                navController.navigate(RoutScreen.RecoverCodeConfirm)
+                navController.navigate(RouteScreen.RecoverCodeConfirm)
             })
         }
-        composable<RoutScreen.RecoverCodeConfirm> {
+        composable<RouteScreen.RecoverCodeConfirm> {
              RecoverNewPassScreen(onNavigationToLogin = {
-                 navController.navigate(RoutScreen.Login)
+                 navController.navigate(RouteScreen.Login)
              })
 
             }
+        composable<RouteScreen.EventDetail> {
+            val eventId = it.toRoute<RouteScreen.EventDetail>()
+           EventDetailScreen(eventId = eventId.eventId)
+        }
         }
     }
