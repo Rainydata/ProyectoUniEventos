@@ -32,12 +32,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.unieventos.components.FormTextField
 import com.unieventos.R
+import com.unieventos.model.Role
+import com.unieventos.utils.SharedPreferenceUtils
+import com.unieventos.viewmodel.UsersViewModel
 
 @Composable
 fun loginScreen(
-    onNavigationToHome: () -> Unit,
+    onNavigationToHome: (Role) -> Unit,
     onNavigationToSignUp: () -> Unit,
-    onNavigationToRecover: () -> Unit
+    onNavigationToRecover: () -> Unit,
+    usersViewModel: UsersViewModel
 ){
 
     val context = LocalContext.current
@@ -48,7 +52,8 @@ fun loginScreen(
             context = context,
             onNavigationToHome = onNavigationToHome,
             onNavigationToSignUp = onNavigationToSignUp,
-            onNavigationToRecover = onNavigationToRecover
+            onNavigationToRecover = onNavigationToRecover,
+            usersViewModel = usersViewModel
 
         )
     }
@@ -58,9 +63,10 @@ fun loginScreen(
 fun LoginForm(
     padding: PaddingValues,
     context: Context,
-    onNavigationToHome: () -> Unit,
+    onNavigationToHome: (Role) -> Unit,
     onNavigationToSignUp: () -> Unit,
-    onNavigationToRecover: () -> Unit
+    onNavigationToRecover: () -> Unit,
+    usersViewModel: UsersViewModel
 ) {
     var email by rememberSaveable { mutableStateOf("") }
     var emailError by rememberSaveable { mutableStateOf(false) }
@@ -112,14 +118,12 @@ fun LoginForm(
                     enabled = email.isNotEmpty() && password.isNotEmpty() && !emailError && !passwordError,
                     onClick = {
 
-                        if (email == "usuario@gmail.com" && password == "123456") {
-                            onNavigationToHome()
+                        val user = usersViewModel.loginUser(email, password)
+
+                        if (user != null) {
+                            SharedPreferenceUtils.savePreference(context, user.cedula, user.role)
+                            onNavigationToHome(user.role)
                         } else {
-
-                            emailError = email != "usuario@gmail.com"
-                            passwordError = password != "123456"
-
-
                             Toast.makeText(context, "Credenciales incorrectas. Intenta de nuevo.", Toast.LENGTH_SHORT).show()
                         }
                     }

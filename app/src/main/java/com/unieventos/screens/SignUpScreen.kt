@@ -116,7 +116,7 @@ fun SignUpForm(
             supportingText = stringResource(id = R.string.Name_validation),
             label = "Nombre",
             Onvalidate = {
-                name.isBlank()
+                name.length < 60
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             isPassword = false
@@ -130,7 +130,7 @@ fun SignUpForm(
             supportingText = stringResource(id = R.string.address_validation),
             label = "Dirección",
             Onvalidate = {
-                address.isBlank()
+                address.length < 60
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             isPassword = false

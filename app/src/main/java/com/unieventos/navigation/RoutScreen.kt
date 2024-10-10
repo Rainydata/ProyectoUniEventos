@@ -14,7 +14,8 @@ sealed class RoutScreen {
     data object  RecoverCode: RoutScreen()
     @Serializable
     data object  RecoverCodeConfirm: RoutScreen()
-
+    @Serializable
+    data object  HomeAdmin: RoutScreen()
     @Serializable
     data object  EditProfile: RoutScreen()
 
