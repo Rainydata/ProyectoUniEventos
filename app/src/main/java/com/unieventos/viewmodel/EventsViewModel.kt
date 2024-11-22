@@ -6,36 +6,36 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class EventsViewModel: ViewModel() {
+class EventsViewModel : ViewModel() {
 
     private val _events = MutableStateFlow(emptyList<Event>())
-    val events : StateFlow<List<Event>> = _events.asStateFlow()
+    val events: StateFlow<List<Event>> = _events.asStateFlow()
 
     init {
         _events.value = getEventsList()
 
     }
 
-    fun createEvent(event: Event){
+    fun createEvent(event: Event) {
         _events.value += event
 
     }
 
-    fun deleteEvent(event: Event){
+    fun deleteEvent(event: Event) {
         _events.value -= event
 
     }
 
-    fun findEventById(id: Int): Event?{
+    fun findEventById(id: Int): Event? {
         return _events.value.find { it.id == id }
 
     }
 
-    fun searchEvents(query: String): List<Event>{
+    fun searchEvents(query: String): List<Event> {
         return _events.value.filter { it.title.contains(query, ignoreCase = true) }
     }
 
-    fun getEventsList(): List<Event>{
+    fun getEventsList(): List<Event> {
         return listOf(
             Event(
                 id = 1,
