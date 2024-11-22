@@ -1,7 +1,9 @@
 package com.unieventos.screens
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -19,6 +21,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.unieventos.model.Event
 
 @Composable
 fun CreateEventScreen(
@@ -108,7 +111,7 @@ fun CreateEventScreen(
                 onClick = {
                     // Create event
                     val newEvent = Event(
-                        id = 0, // ID assigned dynamically in ViewModel or database
+                        id = "", // ID assigned dynamically in ViewModel or database
                         title = title.value,
                         place = place.value,
                         city = city.value,

@@ -53,7 +53,7 @@ class EventsViewModel: ViewModel() {
 
     }
 
-    fun findEventById(id: Int): Event?{
+    fun findEventById(id: String): Event?{
         return null
     }
 

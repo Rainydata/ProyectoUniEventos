@@ -20,6 +20,6 @@ sealed class RouteScreen {
     data object  EditProfile: RouteScreen()
 
     @Serializable
-    data class EventDetail(val eventId: Int) : RouteScreen()
+    data class EventDetail(val eventId: String) : RouteScreen()
 
 }
