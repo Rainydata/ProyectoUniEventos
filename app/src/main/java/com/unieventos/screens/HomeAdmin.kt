@@ -12,9 +12,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.unieventos.viewmodel.EventsViewModel
 
 @Composable
-fun HomeAdmin() {
+fun HomeAdmin(
+    onNavigationToEditProfile: () -> Unit,
+    onNavigationToCreateCoupon: () -> Unit,
+    onNavigationToEventDetail: (String) -> Unit,
+    eventsViewModel: EventsViewModel
+) {
+
     Scaffold { padding ->
         Column(
             modifier = Modifier

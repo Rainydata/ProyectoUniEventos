@@ -10,6 +10,7 @@ import androidx.navigation.toRoute
 import com.unieventos.model.Role
 import com.unieventos.screens.EditProfileScreen
 import com.unieventos.screens.EventDetailScreen
+import com.unieventos.screens.HomeAdmin
 import com.unieventos.screens.HomeScreen
 import com.unieventos.screens.RecoverCodeScreen
 import com.unieventos.screens.RecoverNewPassScreen
@@ -68,21 +69,21 @@ fun Navigation(
             )
         }
 
-        // Pantalla de HomeAdmin
-        //composable<RouteScreen.HomeAdmin> {
-            //HomeAdminScreen(
-                //onNavigationToEditProfile = {
-                    //navController.navigate(RouteScreen.EditProfile)
-                    //},
-                //onNavigationToCreateCoupon = {
-                    //navController.navigate(RouteScreen.CreateCoupon)
-                    //},
-                //onNavigationToEventDetail = { eventId ->
-                    //navController.navigate(RouteScreen.EventDetail(eventId))
-                    //      },
-          //      eventsViewModel = eventsViewModel
-        //    )
-      //  }
+//         Pantalla de HomeAdmin
+        composable<RouteScreen.HomeAdmin> {
+            HomeAdmin(
+                onNavigationToEditProfile = {
+                    navController.navigate(RouteScreen.EditProfile)
+                    },
+                onNavigationToCreateCoupon = {
+                    navController.navigate(RouteScreen.CreateCoupon)
+                    },
+                onNavigationToEventDetail = { eventId ->
+                    navController.navigate(RouteScreen.EventDetail(eventId))
+                          },
+                eventsViewModel = eventsViewModel
+            )
+        }
 
         // Pantalla de Home (para usuarios normales)
         composable<RouteScreen.Home> {
