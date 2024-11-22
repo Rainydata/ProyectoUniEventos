@@ -1,6 +1,5 @@
 package com.unieventos.navigation
 
-import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
@@ -11,7 +10,6 @@ import androidx.navigation.toRoute
 import com.unieventos.model.Role
 import com.unieventos.screens.EditProfileScreen
 import com.unieventos.screens.EventDetailScreen
-import com.unieventos.screens.HomeAdmin
 import com.unieventos.screens.HomeScreen
 import com.unieventos.screens.RecoverCodeScreen
 import com.unieventos.screens.RecoverNewPassScreen
@@ -27,35 +25,38 @@ import com.unieventos.viewmodel.UsersViewModel
 fun Navigation(
     usersViewModel: UsersViewModel,
     eventsViewModel: EventsViewModel
-){
+) {
     val navController = rememberNavController()
     val context = LocalContext.current
     var startDestination: RouteScreen = RouteScreen.Login
-//    var startDestination: RouteScreen = RouteScreen.Home
-    val sesion = SharedPreferenceUtils.getCurrentUser(context)
 
-    if(sesion != null){
-        startDestination = if(sesion.rol == Role.ADMIN){
-            RouteScreen.HomeAdmin
-        }else{
+    // Verificar si existe una sesión activa
+    val session = SharedPreferenceUtils.getCurrentUser(context)
+    if (session != null) {
+        startDestination = if (session.rol == Role.ADMIN) {
+            RouteScreen.HomeAdmin // Inicio en HomeAdmin si es ADMIN
+        } else {
             RouteScreen.Home
         }
     }
 
+    // Configuración de navegación
     NavHost(
         navController = navController,
-        startDestination = startDestination  )
-    {
-        composable<RouteScreen.Login>{
+        startDestination = startDestination
+    ) {
+        // Pantalla de Login
+        composable<RouteScreen.Login> {
             loginScreen(
                 onNavigationToHome = { role ->
-                    val home = if(role == Role.ADMIN){
+                    val homeDestination = if (role == Role.ADMIN) {
                         RouteScreen.HomeAdmin
-                    }else{
+                    } else {
                         RouteScreen.Home
                     }
-                    navController.navigate(home)
-
+                    navController.navigate(homeDestination) {
+                        popUpTo(RouteScreen.Login) { inclusive = true } // Elimina la pantalla de Login de la pila
+                    }
                 },
                 onNavigationToSignUp = {
                     navController.navigate(RouteScreen.Registration)
@@ -65,30 +66,44 @@ fun Navigation(
                 },
                 usersViewModel = usersViewModel
             )
-
-
-        }
-        composable<RouteScreen.HomeAdmin> {
-            HomeAdmin()
         }
 
+        // Pantalla de HomeAdmin
+        //composable<RouteScreen.HomeAdmin> {
+            //HomeAdminScreen(
+                //onNavigationToEditProfile = {
+                    //navController.navigate(RouteScreen.EditProfile)
+                    //},
+                //onNavigationToCreateCoupon = {
+                    //navController.navigate(RouteScreen.CreateCoupon)
+                    //},
+                //onNavigationToEventDetail = { eventId ->
+                    //navController.navigate(RouteScreen.EventDetail(eventId))
+                    //      },
+          //      eventsViewModel = eventsViewModel
+        //    )
+      //  }
+
+        // Pantalla de Home (para usuarios normales)
         composable<RouteScreen.Home> {
             HomeScreen(
                 onNavigationToEditProfile = {
                     navController.navigate(RouteScreen.EditProfile)
                 },
-                eventsViewModel = eventsViewModel,
                 onNavigationToEventDetail = { eventId ->
                     navController.navigate(RouteScreen.EventDetail(eventId))
-                }
+                },
+                eventsViewModel = eventsViewModel
             )
         }
 
+        // Pantalla de Edición de Perfil
         composable<RouteScreen.EditProfile> {
             EditProfileScreen()
         }
 
-        composable<RouteScreen.Registration>{
+        // Pantalla de Registro
+        composable<RouteScreen.Registration> {
             SignUpScreen(
                 onNavigationBack = {
                     navController.popBackStack()
@@ -97,33 +112,50 @@ fun Navigation(
             )
         }
 
-        composable<RouteScreen.Recover>{
+        // Pantalla de Recuperar Contraseña
+        composable<RouteScreen.Recover> {
             RecoverPassScreen(
                 onNavigationToCodePass = {
                     navController.navigate(RouteScreen.RecoverCode)
                 }
             )
         }
+
+        // Pantallas adicionales para recuperación de contraseña
         composable<RouteScreen.RecoverCode> {
             RecoverCodeScreen(onNavigationToRecoverCofirmCode = {
                 navController.navigate(RouteScreen.RecoverCodeConfirm)
             })
         }
-        composable<RouteScreen.RecoverCodeConfirm> {
-             RecoverNewPassScreen(onNavigationToLogin = {
-                 navController.navigate(RouteScreen.Login)
-             })
 
-            }
+        composable<RouteScreen.RecoverCodeConfirm> {
+            RecoverNewPassScreen(
+                onNavigationToLogin = {
+                    navController.navigate(RouteScreen.Login)
+                }
+            )
+        }
+
+        // Detalle del evento
         composable<RouteScreen.EventDetail> {
             val args = it.toRoute<RouteScreen.EventDetail>()
-           EventDetailScreen(
-               eventId = args.eventId,
-               eventsViewModel = eventsViewModel,
-               onNavigateBack={
-                   navController.popBackStack()
-               }
-           )
+            EventDetailScreen(
+                eventId = args.eventId,
+                eventsViewModel = eventsViewModel,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
         }
-        }
+
+        // Pantalla para crear cupones
+        //composable<RouteScreen.CreateCoupon> {
+          //  CreateCouponScreen(
+            //    onNavigationBack = {
+              //      navController.popBackStack()
+                //}
+            //)
+        //}
     }
+}
+
