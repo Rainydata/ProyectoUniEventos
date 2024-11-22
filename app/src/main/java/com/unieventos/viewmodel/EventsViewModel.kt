@@ -1,5 +1,6 @@
 package com.unieventos.viewmodel
 
+import androidx.compose.animation.core.snap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.ktx.firestore
@@ -45,16 +46,46 @@ class EventsViewModel: ViewModel() {
             db.collection("events")
                 .add(event)
                 .await()
+                loadEvents()
+
+            _events.value = getEventsList()
+
         }
     }
 
-    fun deleteEvent(event: Event){
-        _events.value -= event
+    fun deleteEvent(eventId: String){
+        viewModelScope.launch{
+            db.collection("events")
+                .document(eventId)
+                .delete()
+                .await()
 
+            _events.value = getEventsList()
+
+        }
     }
 
-    fun findEventById(id: String): Event?{
-        return null
+    fun updateEvent(event: Event){
+        viewModelScope.launch{
+            db.collection("events")
+                .document(event.id)
+                .set(event)
+                .await()
+
+            _events.value = getEventsList()
+
+        }
+    }
+
+    suspend fun findEventById(id: String): Event?{
+        val snapshot = db.collection("events")
+            .document(id)
+            .get()
+            .await()
+
+        val event = snapshot.toObject(Event::class.java)
+        event?.id = snapshot.id
+        return event
     }
 
     fun searchEvents(query: String): List<Event>{
