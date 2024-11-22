@@ -1,5 +1,6 @@
 package com.unieventos.navigation
 
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
@@ -10,6 +11,7 @@ import androidx.navigation.toRoute
 import com.unieventos.model.Role
 import com.unieventos.screens.EditProfileScreen
 import com.unieventos.screens.EventDetailScreen
+import com.unieventos.screens.HomeAdmin
 import com.unieventos.screens.HomeScreen
 import com.unieventos.screens.RecoverCodeScreen
 import com.unieventos.screens.RecoverNewPassScreen
@@ -28,13 +30,13 @@ fun Navigation(
 ){
     val navController = rememberNavController()
     val context = LocalContext.current
-//    var startDestination: RouteScreen = RouteScreen.Login
-    var startDestination: RouteScreen = RouteScreen.Home
+    var startDestination: RouteScreen = RouteScreen.Login
+//    var startDestination: RouteScreen = RouteScreen.Home
     val sesion = SharedPreferenceUtils.getCurrentUser(context)
 
     if(sesion != null){
         startDestination = if(sesion.rol == Role.ADMIN){
-            RouteScreen.Recover
+            RouteScreen.HomeAdmin
         }else{
             RouteScreen.Home
         }
@@ -52,9 +54,7 @@ fun Navigation(
                     }else{
                         RouteScreen.Home
                     }
-                    navController.navigate(home){
-
-                    }
+                    navController.navigate(home)
 
                 },
                 onNavigationToSignUp = {
@@ -65,14 +65,12 @@ fun Navigation(
                 },
                 usersViewModel = usersViewModel
             )
+
+
         }
-//        composable<RouteScreen.HomeAdmin> {
-//            HomeScreen(
-//                onNavigationToEditProfile = {
-//                    navController.navigate(RouteScreen.HomeAdmin)
-//                }
-//            )
-//        }
+        composable<RouteScreen.HomeAdmin> {
+            HomeAdmin()
+        }
 
         composable<RouteScreen.Home> {
             HomeScreen(

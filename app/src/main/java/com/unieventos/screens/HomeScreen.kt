@@ -13,8 +13,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Logout
+import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -23,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.unieventos.model.Event
+import com.unieventos.utils.SharedPreferenceUtils
 import com.unieventos.viewmodel.EventsViewModel
 import dev.chrisbanes.haze.HazeDefaults
 import dev.chrisbanes.haze.HazeState
@@ -63,9 +69,18 @@ fun HomeScreen(
 fun TopBarHome(
     hazeState: HazeState
 ){
+    val context = LocalContext.current
+
 CenterAlignedTopAppBar(
     colors = TopAppBarDefaults.largeTopAppBarColors(Color.Transparent),
     modifier = Modifier.hazeChild(state =hazeState),
+    actions = {
+        IconButton(onClick = {
+            SharedPreferenceUtils.clearPreference(context)
+        }) {
+            Icon(imageVector = Icons.AutoMirrored.Rounded.Logout, contentDescription = null)
+        }
+    },
     title = {
     Text(text = "UniEventos")
 },

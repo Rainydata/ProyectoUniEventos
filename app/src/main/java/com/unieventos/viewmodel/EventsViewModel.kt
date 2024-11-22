@@ -1,24 +1,51 @@
 package com.unieventos.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.unieventos.model.Event
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class EventsViewModel: ViewModel() {
 
+    val db = Firebase.firestore
     private val _events = MutableStateFlow(emptyList<Event>())
     val events : StateFlow<List<Event>> = _events.asStateFlow()
 
     init {
-        _events.value = getEventsList()
-
+        loadEvents()
     }
 
-    fun createEvent(event: Event){
-        _events.value += event
+    fun loadEvents(){
+        viewModelScope.launch {
+            _events.value = getEventsList()
+        }
+    }
 
+    private suspend fun getEventsList(): List<Event>{
+        val snapshot = db.collection("events")
+            .get()
+            .await()
+
+        return snapshot.documents.mapNotNull {
+            val event = it.toObject(Event::class.java)
+            requireNotNull(event)
+            event.id = it.id
+            event
+        }
+    }
+
+    suspend fun createEvent(event: Event){
+        viewModelScope.launch {
+            db.collection("events")
+                .add(event)
+                .await()
+        }
     }
 
     fun deleteEvent(event: Event){
@@ -27,78 +54,11 @@ class EventsViewModel: ViewModel() {
     }
 
     fun findEventById(id: Int): Event?{
-        return _events.value.find { it.id == id }
-
+        return null
     }
 
     fun searchEvents(query: String): List<Event>{
-        return _events.value.filter { it.title.contains(query, ignoreCase = true) }
+    return listOf()
     }
-
-    fun getEventsList(): List<Event>{
-        return listOf(
-            Event(
-                id = 1,
-                place = "Teatro Municipal",
-                title = "Evento1",
-                city = "Medellin",
-                date = "12 Octubre",
-                time = "19:00",
-                category = "Teatro",
-                address = "Calle 1",
-                opening = "19:00",
-                image = "https://loremflickr.com/400/400/theater"
-            ),
-            Event(
-                id = 2,
-                place = "Teatro Departamental",
-                title = "Evento2",
-                city = "Medellin",
-                date = "9 Noviembre",
-                time = "19:00",
-                category = "Teatro",
-                address = "Calle 2",
-                opening = "19:00",
-                image = "https://loremflickr.com/400/400/theater"
-            ),
-            Event(
-                id = 3,
-                place = "Concierto",
-                title = "Evento3",
-                city = "Bogotá",
-                date = "11 Octubre",
-                time = "19:00",
-                category = "Teatro",
-                address = "Calle 2",
-                opening = "19:00",
-                image = "https://loremflickr.com/400/400/concert"
-            ),
-            Event(
-                id = 2,
-                place = "Teatro Departamental",
-                title = "Evento2",
-                city = "Medellin",
-                date = "10 Octubre",
-                time = "19:00",
-                category = "Teatro",
-                address = "Calle 2",
-                opening = "19:00",
-                image = "https://loremflickr.com/400/400/theater"
-            ),
-            Event(
-                id = 2,
-                place = "Teatro Departamental",
-                title = "Evento2",
-                city = "Medellin",
-                date = "1 Noviembre",
-                time = "20:00",
-                category = "Teatro",
-                address = "Calle 2",
-                opening = "19:00",
-                image = "https://loremflickr.com/400/400/theater"
-            ),
-        )
-    }
-
 
 }

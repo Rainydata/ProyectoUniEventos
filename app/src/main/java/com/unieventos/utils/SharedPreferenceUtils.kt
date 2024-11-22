@@ -25,7 +25,7 @@ object SharedPreferenceUtils {
 
     fun getCurrentUser(context: Context): UserDTO?{
         val sharedPreferences = context.getSharedPreferences("sesion",Context.MODE_PRIVATE)
-        val cedula = sharedPreferences.getString("cedula", "")
+        val cedula = sharedPreferences.getString("sesion", "")
         val rol = sharedPreferences.getString("rol", "")
 
         return if(cedula.isNullOrEmpty() || rol.isNullOrEmpty()){

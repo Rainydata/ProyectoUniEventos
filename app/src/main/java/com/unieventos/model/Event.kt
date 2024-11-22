@@ -3,7 +3,7 @@ package com.unieventos.model
 import java.util.Date
 
 data class Event(
-    val id: Int,
+    var id: String,
     val title: String,
     val place: String,
     val city: String,
