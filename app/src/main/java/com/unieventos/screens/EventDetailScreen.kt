@@ -28,7 +28,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.unieventos.viewmodel.EventsViewModel
 
 @Composable
@@ -53,7 +52,7 @@ fun EventDetailScreen(
         Column(
             modifier = Modifier.padding(padding)
         ) {
-            val model = ImageRequest.Builder(LocalContext.current)
+            val model = coil.request.ImageRequest.Builder(LocalContext.current)
                 .data(event.image)
                 .crossfade(true)
                 .build()
