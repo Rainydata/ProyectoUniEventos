@@ -19,6 +19,8 @@ sealed class RouteScreen {
     @Serializable
     data object  EditProfile: RouteScreen()
     @Serializable
+    data object  CouponScreen: RouteScreen()
+    @Serializable
     data object  CreateCoupon: RouteScreen()
     @Serializable
     data object  CreateEvent: RouteScreen()

@@ -37,6 +37,7 @@ import com.unieventos.navigation.Navigation
 import com.unieventos.screens.HomeScreen
 import com.unieventos.ui.components.ItemEvento
 import com.unieventos.ui.theme.ProyectoUniEventosTheme
+import com.unieventos.viewmodel.CouponsViewModel
 import com.unieventos.viewmodel.EventsViewModel
 import com.unieventos.viewmodel.UsersViewModel
 
@@ -44,6 +45,7 @@ class MainActivity : ComponentActivity() {
 
     private val usersViewModel: UsersViewModel by viewModels()
     private val eventsViewModel: EventsViewModel by viewModels()
+    private val couponsViewModel: CouponsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +54,8 @@ class MainActivity : ComponentActivity() {
             ProyectoUniEventosTheme {
                 Navigation(
                     usersViewModel = usersViewModel,
-                    eventsViewModel = eventsViewModel
+                    eventsViewModel = eventsViewModel,
+                    couponsViewModel = couponsViewModel
 
                 )
             }

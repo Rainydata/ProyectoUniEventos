@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.unieventos.model.Role
+import com.unieventos.screens.CreateCouponScreen
 import com.unieventos.screens.EditProfileScreen
 import com.unieventos.screens.EventDetailScreen
 import com.unieventos.screens.HomeAdmin
@@ -21,6 +22,7 @@ import com.unieventos.screens.SignUpScreen
 import com.unieventos.screens.RecoverPassScreen
 import com.unieventos.ui.screen.CouponScreen
 import com.unieventos.utils.SharedPreferenceUtils
+import com.unieventos.viewmodel.CouponsViewModel
 import com.unieventos.viewmodel.EventsViewModel
 import com.unieventos.viewmodel.UsersViewModel
 
@@ -28,7 +30,8 @@ import com.unieventos.viewmodel.UsersViewModel
 @Composable
 fun Navigation(
     usersViewModel: UsersViewModel,
-    eventsViewModel: EventsViewModel
+    eventsViewModel: EventsViewModel,
+    couponsViewModel: CouponsViewModel
 ) {
 
     val currentUser by usersViewModel.currentUser.collectAsState()
@@ -169,10 +172,11 @@ fun Navigation(
 
 //         Pantalla para crear cupones
         composable<RouteScreen.CreateCoupon> {
-            CouponScreen(
+            CreateCouponScreen(
                 onNavigationBack = {
                     navController.popBackStack()
-                }
+                },
+                couponsViewModel = couponsViewModel
             )
         }
     }
