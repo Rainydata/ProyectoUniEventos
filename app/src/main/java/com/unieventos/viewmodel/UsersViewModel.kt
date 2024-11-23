@@ -1,6 +1,5 @@
 package com.unieventos.viewmodel
 
-import android.provider.ContactsContract.CommonDataKinds.Email
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -8,6 +7,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.unieventos.model.Role
 import com.unieventos.model.User
+import com.unieventos.utils.RequestResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,13 +22,21 @@ class UsersViewModel: ViewModel() {
     private val _users = MutableStateFlow(emptyList<User>())
     val users: StateFlow <List<User>> = _users.asStateFlow()
 
+    private val _authResult = MutableStateFlow<RequestResult?>(null)
+    val authResult: StateFlow<RequestResult?> = _authResult.asStateFlow()
+
     init {
         _users.value = getUsersList()
     }
 
     fun createUser(user: User){
         viewModelScope.launch{
-            createuserFirebase(user)
+           _authResult.value = RequestResult.Loading
+            _authResult.value = kotlin.runCatching { createuserFirebase(user) }
+                .fold(
+                    onSuccess = {RequestResult.Success("Usuario creado exitosamente")},
+                    onFailure = {RequestResult.Failure(it.message.toString())}
+                )
         }
     }
 
@@ -36,16 +44,25 @@ class UsersViewModel: ViewModel() {
         val response = auth.createUserWithEmailAndPassword(user.email, user.password).await()
         val userId = response.user?.uid ?: throw Exception("No se pudo crear el usuario")
 
-        user.id = userId
+        val userSave = user.copy(id = userId, password = "")
 
         //TODO no guardar la contraseña
         db.collection("users")
-            .add(user)
+            .document(userId)
+            .set(userSave)
             .await()
     }
 
-    fun loginUser(email: String, password: String): User?{
-        return _users.value.find { it.email == email && it.password == password }
+    fun login(email: String, password: String): User?{
+        viewModelScope.launch{
+            loginFirebase(email, password)
+        }
+        return null
+    }
+
+    private suspend fun loginFirebase(email: String, password: String){
+        val response = auth.signInWithEmailAndPassword(email, password).await()
+        val userId = response.user?.uid ?: throw Exception("No se pudo iniciar sesión")
     }
 
     fun deleteUser(userId: String) {
@@ -61,6 +78,11 @@ class UsersViewModel: ViewModel() {
         .document(userId)
         .delete()
         .await()
+    }
+
+    fun resetAuthResult(){
+        _authResult.value = null
+
     }
 
     private fun getUsersList():List<User>{

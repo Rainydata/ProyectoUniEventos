@@ -14,9 +14,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -30,7 +34,9 @@ import com.unieventos.components.FormTextField
 import com.unieventos.R
 import com.unieventos.model.Role
 import com.unieventos.model.User
+import com.unieventos.utils.RequestResult
 import com.unieventos.viewmodel.UsersViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun SignUpScreen(
@@ -56,6 +62,9 @@ fun SignUpForm(
     onNavigationBack: () -> Unit,
     usersViewModel: UsersViewModel
 ) {
+
+    val authResult by usersViewModel.authResult.collectAsState()
+
     var cedula by rememberSaveable { mutableStateOf("") }
     var name by rememberSaveable { mutableStateOf("") }
     var address by rememberSaveable { mutableStateOf("") }
@@ -190,12 +199,37 @@ fun SignUpForm(
                         password = password,
                         role = Role.CLIENT
                     ))
-                    onNavigationBack()
-                    Toast.makeText(context, context.getString(R.string.userCreated), Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(context, context.getString(R.string.userCreated), Toast.LENGTH_SHORT).show()
                 }
             }) {
                 Text(text = "Crear Cuenta")
             }
+
+        }
+
+        when (authResult) {
+            is RequestResult.Loading -> {
+                CircularProgressIndicator()
+            }
+            is RequestResult.Success -> {
+                Text(
+                    text = (authResult as RequestResult.Success).message,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                LaunchedEffect(Unit) {
+                    delay(1200)
+                    onNavigationBack()
+                    usersViewModel.resetAuthResult()
+                }
+            }
+            is RequestResult.Failure ->{
+                Text(
+                    text = (authResult as RequestResult.Failure).messageError,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+            null -> {}
+
         }
     }
 }

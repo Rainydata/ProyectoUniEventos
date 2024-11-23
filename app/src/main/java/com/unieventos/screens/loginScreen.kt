@@ -118,7 +118,7 @@ fun LoginForm(
                     enabled = email.isNotEmpty() && password.isNotEmpty() && !emailError && !passwordError,
                     onClick = {
 
-                        val user = usersViewModel.loginUser(email, password)
+                        val user = usersViewModel.login(email, password)
 
                         if (user != null) {
                             SharedPreferenceUtils.savePreference(context, user.cedula, user.role)
