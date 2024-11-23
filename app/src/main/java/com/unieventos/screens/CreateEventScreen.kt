@@ -62,9 +62,15 @@ fun CreateEventScreen(
     var opening by rememberSaveable { mutableStateOf("") }
     var image by rememberSaveable { mutableStateOf("") }
 
-    var isFormValid by rememberSaveable { mutableStateOf(false) }
-
-    val eventCreationResult by eventsViewModel.eventCreationResult.collectAsState()
+    // Estados para errores de validación
+    var titleError by rememberSaveable { mutableStateOf<String?>(null) }
+    var placeError by rememberSaveable { mutableStateOf<String?>(null) }
+    var cityError by rememberSaveable { mutableStateOf<String?>(null) }
+    var dateError by rememberSaveable { mutableStateOf<String?>(null) }
+    var timeError by rememberSaveable { mutableStateOf<String?>(null) }
+    var categoryError by rememberSaveable { mutableStateOf<String?>(null) }
+    var addressError by rememberSaveable { mutableStateOf<String?>(null) }
+    var openingError by rememberSaveable { mutableStateOf<String?>(null) }
 
     if (eventId != null) {
         LaunchedEffect(eventId) {
@@ -83,14 +89,6 @@ fun CreateEventScreen(
         }
     }
 
-    LaunchedEffect(title, place, city, date, time, category, address, opening, image) {
-        isFormValid = title.isNotBlank() && place.isNotBlank() && city.isNotBlank() &&
-                date.matches(Regex("\\d{4}-\\d{2}-\\d{2}")) &&
-                time.matches(Regex("\\d{2}:\\d{2}")) &&
-                category.isNotBlank() && address.isNotBlank() &&
-                opening.matches(Regex("\\d+(\\.\\d{1,2})?")) // Valida apertura como un número
-    }
-
     Scaffold { padding ->
         Column(
             modifier = Modifier
@@ -101,110 +99,145 @@ fun CreateEventScreen(
             verticalArrangement = Arrangement.Top
         ) {
             // Campo para el título
-            EventField(
+            ValidatedTextField(
                 label = "Título",
                 value = title,
-                onValueChange = { title = it }
+                error = titleError,
+                onValueChange = {
+                    title = it
+                    titleError = if (it.isBlank()) "El título no puede estar vacío" else null
+                }
             )
             // Campo para el lugar
-            EventField(
+            ValidatedTextField(
                 label = "Lugar",
                 value = place,
-                onValueChange = { place = it }
+                error = placeError,
+                onValueChange = {
+                    place = it
+                    placeError = if (it.isBlank()) "El lugar no puede estar vacío" else null
+                }
             )
             // Campo para la ciudad
-            EventField(
+            ValidatedTextField(
                 label = "Ciudad",
                 value = city,
-                onValueChange = { city = it }
+                error = cityError,
+                onValueChange = {
+                    city = it
+                    cityError = if (it.isBlank()) "La ciudad no puede estar vacía" else null
+                }
             )
             // Campo para la fecha
-            EventField(
+            ValidatedTextField(
                 label = "Fecha (YYYY-MM-DD)",
                 value = date,
-                onValueChange = { date = it }
+                error = dateError,
+                onValueChange = {
+                    date = it
+                    dateError = if (!it.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))) "Fecha inválida" else null
+                }
             )
             // Campo para la hora
-            EventField(
+            ValidatedTextField(
                 label = "Hora (HH:mm)",
                 value = time,
-                onValueChange = { time = it }
+                error = timeError,
+                onValueChange = {
+                    time = it
+                    timeError = if (!it.matches(Regex("\\d{2}:\\d{2}"))) "Hora inválida" else null
+                }
             )
             // Campo para la categoría
-            EventField(
+            ValidatedTextField(
                 label = "Categoría",
                 value = category,
-                onValueChange = { category = it }
+                error = categoryError,
+                onValueChange = {
+                    category = it
+                    categoryError = if (it.isBlank()) "La categoría no puede estar vacía" else null
+                }
             )
             // Campo para la dirección
-            EventField(
+            ValidatedTextField(
                 label = "Dirección",
                 value = address,
-                onValueChange = { address = it }
+                error = addressError,
+                onValueChange = {
+                    address = it
+                    addressError = if (it.isBlank()) "La dirección no puede estar vacía" else null
+                }
             )
             // Campo para la apertura
-            EventField(
+            ValidatedTextField(
                 label = "Apertura",
                 value = opening,
-                onValueChange = { opening = it }
-            )
-            // Campo para la imagen
-            EventField(
-                label = "Imagen (URL)",
-                value = image,
-                onValueChange = { image = it }
+                error = openingError,
+                onValueChange = {
+                    opening = it
+                    openingError = if (!it.matches(Regex("\\d+(\\.\\d{1,2})?"))) "Apertura inválida" else null
+                }
             )
 
             // Botón para guardar el evento
             Button(
                 onClick = {
-                    eventsViewModel.createEvent(
-                        Event(
-                            id = event?.id ?: "",
-                            title = title,
-                            place = place,
-                            city = city,
-                            date = date,
-                            time = time,
-                            category = category,
-                            address = address,
-                            opening = opening,
-                            image = image
+                    if (titleError == null && placeError == null && cityError == null &&
+                        dateError == null && timeError == null && categoryError == null &&
+                        addressError == null && openingError == null
+                    ) {
+                        eventsViewModel.createEvent(
+                            Event(
+                                id = event?.id ?: "",
+                                title = title,
+                                place = place,
+                                city = city,
+                                date = date,
+                                time = time,
+                                category = category,
+                                address = address,
+                                opening = opening,
+                                image = image
+                            )
                         )
-                    )
+                    }
                 },
-                enabled = isFormValid
+                enabled = titleError == null && placeError == null && cityError == null &&
+                        dateError == null && timeError == null && categoryError == null &&
+                        addressError == null && openingError == null
             ) {
                 Text(text = "Guardar Evento")
-            }
-
-            // Estado del resultado de creación del evento
-            when (eventCreationResult) {
-                is RequestResult.Loading -> {
-                    CircularProgressIndicator()
-                }
-                is RequestResult.Success -> {
-                    Text(
-                        text = (eventCreationResult as RequestResult.Success).message,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    LaunchedEffect(Unit) {
-                        delay(1200)
-                        onNavigationBack()
-                        eventsViewModel.resetEventCreationResult()
-                    }
-                }
-                is RequestResult.Failure -> {
-                    Text(
-                        text = (eventCreationResult as RequestResult.Failure).messageError,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-                null -> {}
             }
         }
     }
 }
+
+@Composable
+fun ValidatedTextField(
+    label: String,
+    value: String,
+    error: String?,
+    onValueChange: (String) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = { Text(label) },
+            isError = error != null,
+            modifier = Modifier.fillMaxWidth()
+        )
+        if (error != null) {
+            Text(
+                text = error,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+            )
+        }
+    }
+}
+
 
 
 // Composable for an event field with label and text input
