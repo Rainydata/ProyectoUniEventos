@@ -15,10 +15,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -33,12 +37,14 @@ import androidx.compose.ui.unit.dp
 import com.unieventos.components.FormTextField
 import com.unieventos.R
 import com.unieventos.model.Role
+import com.unieventos.utils.RequestResult
 import com.unieventos.utils.SharedPreferenceUtils
 import com.unieventos.viewmodel.UsersViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun loginScreen(
-    onNavigationToHome: (Role) -> Unit,
+    onNavigationToHome: () -> Unit,
     onNavigationToSignUp: () -> Unit,
     onNavigationToRecover: () -> Unit,
     usersViewModel: UsersViewModel
@@ -49,7 +55,6 @@ fun loginScreen(
     Scaffold { padding ->
         LoginForm(
             padding = padding,
-            context = context,
             onNavigationToHome = onNavigationToHome,
             onNavigationToSignUp = onNavigationToSignUp,
             onNavigationToRecover = onNavigationToRecover,
@@ -62,12 +67,14 @@ fun loginScreen(
 @Composable
 fun LoginForm(
     padding: PaddingValues,
-    context: Context,
-    onNavigationToHome: (Role) -> Unit,
+    onNavigationToHome: () -> Unit,
     onNavigationToSignUp: () -> Unit,
     onNavigationToRecover: () -> Unit,
     usersViewModel: UsersViewModel
 ) {
+
+    val authResult by usersViewModel.authResult.collectAsState()
+
     var email by rememberSaveable { mutableStateOf("") }
     var emailError by rememberSaveable { mutableStateOf(false) }
     var password by rememberSaveable { mutableStateOf("") }
@@ -117,15 +124,7 @@ fun LoginForm(
                 Button(
                     enabled = email.isNotEmpty() && password.isNotEmpty() && !emailError && !passwordError,
                     onClick = {
-
-                        val user = usersViewModel.loginUser(email, password)
-
-                        if (user != null) {
-                            SharedPreferenceUtils.savePreference(context, user.cedula, user.role)
-                            onNavigationToHome(user.role)
-                        } else {
-                            Toast.makeText(context, "Credenciales incorrectas. Intenta de nuevo.", Toast.LENGTH_SHORT).show()
-                        }
+                        usersViewModel.login(email, password)
                     }
                 ) {
                     Text(text = "Iniciar Sesion")
@@ -152,6 +151,32 @@ fun LoginForm(
             ) {
                 Text(text = "¿Has olvidado la contraseña?")
             }
+
+            when (authResult) {
+                is RequestResult.Loading -> {
+                    CircularProgressIndicator()
+                }
+                is RequestResult.Success -> {
+                    Text(
+                        text = (authResult as RequestResult.Success).message,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    LaunchedEffect(Unit) {
+                        delay(1200)
+                        onNavigationToHome()
+                        usersViewModel.resetAuthResult()
+                    }
+                }
+                is RequestResult.Failure ->{
+                    Text(
+                        text = (authResult as RequestResult.Failure).messageError,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+                null -> {}
+
+            }
+
         }
     }
 }

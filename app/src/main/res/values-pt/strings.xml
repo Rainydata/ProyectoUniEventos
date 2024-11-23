@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">ProjetoUniEventos</string>
+    <string name="email_validation">O email não é válido</string>
+    <string name="password_validation">A senha deve ter mais de 6 caracteres</string>
+    <string name="cedula_validation">Cédula não é válida</string>
+    <string name="Name_validation">Nome não é válido</string>
+    <string name="address_validation">Endereço não válido</string>
+    <string name="PhoneNumber_validation">Número de telefone não válido</string>
+    <string name="Code_validation">Código não válido</string>
+    <string name="userCreated">Registrado com sucesso!</string>
+</resources>
+

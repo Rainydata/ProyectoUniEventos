@@ -3,6 +3,7 @@ package com.unieventos.screens
 import android.content.Context
 import android.provider.ContactsContract.CommonDataKinds.Phone
 import android.util.Patterns
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,9 +14,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -27,15 +32,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import com.unieventos.components.FormTextField
 import com.unieventos.R
+import com.unieventos.model.Role
+import com.unieventos.model.User
+import com.unieventos.utils.RequestResult
+import com.unieventos.viewmodel.UsersViewModel
+import kotlinx.coroutines.delay
 
 @Composable
-fun SignUpScreen() {
+fun SignUpScreen(
+    onNavigationBack: () -> Unit,
+    usersViewModel: UsersViewModel
+) {
     val context = LocalContext.current
 
     Scaffold { padding ->
         SignUpForm(
             padding = padding,
-            context = context
+            context = context,
+            onNavigationBack = onNavigationBack,
+            usersViewModel = usersViewModel
         )
     }
 }
@@ -43,15 +58,21 @@ fun SignUpScreen() {
 @Composable
 fun SignUpForm(
     padding: PaddingValues,
-    context: Context
+    context: Context,
+    onNavigationBack: () -> Unit,
+    usersViewModel: UsersViewModel
 ) {
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var passwordConfirm by rememberSaveable { mutableStateOf("") }
+
+    val authResult by usersViewModel.authResult.collectAsState()
+
+    var cedula by rememberSaveable { mutableStateOf("") }
     var name by rememberSaveable { mutableStateOf("") }
     var address by rememberSaveable { mutableStateOf("") }
     var phoneNumber by rememberSaveable { mutableStateOf("") }
-    var isPasswordMatch by rememberSaveable { mutableStateOf(true) }
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var passwordConfirm by rememberSaveable { mutableStateOf("") }
+   var isPasswordMatch by rememberSaveable { mutableStateOf(true) }
 
     Column(
         modifier = Modifier
@@ -60,6 +81,64 @@ fun SignUpForm(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        FormTextField(
+            value = cedula,
+            onValueChange = {
+                cedula = it
+            },
+            supportingText = stringResource(id = R.string.cedula_validation),
+            label = "Cedula",
+            Onvalidate = {
+                cedula.length > 60
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            isPassword = false
+        )
+
+        FormTextField(
+            value = name,
+            onValueChange = {
+                name = it
+            },
+            supportingText = stringResource(id = R.string.Name_validation),
+            label = "Nombre",
+            Onvalidate = {
+                name.isBlank() && name.length > 60
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            isPassword = false
+        )
+
+        FormTextField(
+            value = address,
+            onValueChange = {
+                address = it
+            },
+            supportingText = stringResource(id = R.string.address_validation),
+            label = "Dirección",
+            Onvalidate = {
+                address.isBlank() && address.length > 60
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            isPassword = false
+        )
+
+        FormTextField(
+            value = phoneNumber,
+            onValueChange = {
+                if (it.all { char -> char.isDigit() }) {
+                    phoneNumber = it
+                }
+            },
+            supportingText = stringResource(id = R.string.PhoneNumber_validation),
+            label = "Número",
+            Onvalidate = {
+                phoneNumber.length != 10
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            isPassword = false
+        )
+
         FormTextField(
             value = email,
             onValueChange = {
@@ -108,58 +187,51 @@ fun SignUpForm(
             isPassword = true
         )
 
-        FormTextField(
-            value = name,
-            onValueChange = {
-                name = it
-            },
-            supportingText = stringResource(id = R.string.Name_validation),
-            label = "Nombre",
-            Onvalidate = {
-                name.length < 60
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            isPassword = false
-        )
-
-        FormTextField(
-            value = address,
-            onValueChange = {
-                address = it
-            },
-            supportingText = stringResource(id = R.string.address_validation),
-            label = "Dirección",
-            Onvalidate = {
-                address.length < 60
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            isPassword = false
-        )
-
-        FormTextField(
-            value = phoneNumber,
-            onValueChange = {
-                if (it.all { char -> char.isDigit() }) {
-                    phoneNumber = it
-                }
-            },
-            supportingText = stringResource(id = R.string.PhoneNumber_validation),
-            label = "Número",
-            Onvalidate = {
-                phoneNumber.length != 10
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            isPassword = false
-        )
-
         Row {
             Button(onClick = {
                 if (isPasswordMatch) {
-
+                    usersViewModel.createUser(User(
+                        cedula = cedula,
+                        name = name,
+                        address = address,
+                        phoneNumber =phoneNumber,
+                        email = email,
+                        password = password,
+                        role = Role.CLIENT
+                    ))
+//                    Toast.makeText(context, context.getString(R.string.userCreated), Toast.LENGTH_SHORT).show()
                 }
             }) {
                 Text(text = "Crear Cuenta")
             }
+
+        }
+
+        when (authResult) {
+            is RequestResult.Loading -> {
+                CircularProgressIndicator()
+            }
+            is RequestResult.Success -> {
+                Text(
+                    text = (authResult as RequestResult.Success).message,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                LaunchedEffect(Unit) {
+                    delay(1200)
+                    onNavigationBack()
+                    usersViewModel.resetAuthResult()
+                }
+            }
+            is RequestResult.Failure ->{
+                Text(
+                    text = (authResult as RequestResult.Failure).messageError,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+            null -> {}
+
         }
     }
 }
+
+
