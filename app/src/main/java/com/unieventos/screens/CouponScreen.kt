@@ -127,4 +127,3 @@ fun CouponItem(coupon: Coupon, onDelete: () -> Unit) {
 fun CouponScreenPreview() {
     CouponScreen(onNavigationToCreateCoupon = {})
 }
-
