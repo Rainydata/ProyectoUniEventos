@@ -57,7 +57,7 @@ fun Navigation(
                         RouteScreen.Home
                     }
                     navController.navigate(homeDestination) {
-                        popUpTo(RouteScreen.Login) { inclusive = true } // Elimina la pantalla de Login de la pila
+                        popUpTo(RouteScreen.Login) { inclusive = true }
                     }
                 },
                 onNavigationToSignUp = {
@@ -73,6 +73,7 @@ fun Navigation(
 //         Pantalla de HomeAdmin
         composable<RouteScreen.HomeAdmin> {
             HomeAdmin(
+
                 onNavigationToEditProfile = {
                     navController.navigate(RouteScreen.EditProfile)
                 },
@@ -85,7 +86,8 @@ fun Navigation(
                 onNavigationToCreateEvent = {
                     navController.navigate(RouteScreen.CreateEvent)
                 },
-                eventsViewModel = eventsViewModel
+                eventsViewModel = eventsViewModel,
+                navController = navController
             )
         }
 
