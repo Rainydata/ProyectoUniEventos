@@ -3,6 +3,10 @@ package com.unieventos.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Archive
+import androidx.compose.material.icons.rounded.LocalActivity
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -12,18 +16,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.unieventos.viewmodel.EventsViewModel
+
 
 @Composable
 fun HomeAdmin(
+
     onNavigationToEditProfile: () -> Unit,
+
     onNavigationToCreateCoupon: () -> Unit,
     onNavigationToEventDetail: (String) -> Unit,
     onNavigationToCreateEvent: () -> Unit,
-    eventsViewModel: EventsViewModel
+    eventsViewModel: EventsViewModel,
+    navController: NavController
 ) {
-
-    Scaffold { padding ->
+    Scaffold(
+        bottomBar = { BottomBarHomeAdmin(navController = navController)}
+    ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
@@ -32,16 +42,12 @@ fun HomeAdmin(
             verticalArrangement = Arrangement.Top
         ) {
             Spacer(modifier = Modifier.height(20.dp))
-
-            // Título del panel de administración
             Text(
                 text = "Panel de Administración",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(16.dp)
             )
-
-            // Botones para las acciones principales
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -49,31 +55,26 @@ fun HomeAdmin(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
-                    onClick = { onNavigationToCreateEvent },
+                    onClick = { onNavigationToCreateEvent() },
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(text = "Gestionar Eventos")
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
-                    onClick = { onNavigationToCreateCoupon },
+                    onClick = { onNavigationToCreateCoupon() },
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(text = "Crear Cupones")
                 }
             }
-
             Spacer(modifier = Modifier.height(20.dp))
-
-            // Sección de lista de eventos creados
             Text(
                 text = "Eventos Creados",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(16.dp)
             )
-
-            // Lista de eventos creados
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -81,10 +82,63 @@ fun HomeAdmin(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
-                }
             }
         }
     }
+}
+
+
+
+@Composable
+fun BottomBarHomeAdmin(navController: NavController) {
+    NavigationBar {
+        NavigationBarItem(
+            icon = {
+                Icon(
+                    imageVector = Icons.Rounded.LocalActivity,
+                    contentDescription = null
+                )
+            },
+            onClick = {
+                navController.navigate("events") // Navegar a la pantalla de eventos
+            },
+            label = {
+                Text(text = "Eventos")
+            },
+            selected = false
+        )
+        NavigationBarItem(
+            icon = {
+                Icon(
+                    imageVector = Icons.Rounded.Archive,
+                    contentDescription = null
+                )
+            },
+            onClick = {
+                navController.navigate("coupons") // Navegar a la pantalla de cupones
+            },
+            label = {
+                Text(text = "Cupones")
+            },
+            selected = false
+        )
+        NavigationBarItem(
+            icon = {
+                Icon(
+                    imageVector = Icons.Rounded.Person,
+                    contentDescription = null
+                )
+            },
+            onClick = {
+                navController.navigate("profile") // Navegar a la pantalla de perfil
+            },
+            label = {
+                Text(text = "Perfil")
+            },
+            selected = false
+        )
+    }
+}
 
 
 // Composable para mostrar una tarjeta de evento

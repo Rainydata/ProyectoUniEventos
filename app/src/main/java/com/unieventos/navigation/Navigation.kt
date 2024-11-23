@@ -63,7 +63,7 @@ fun Navigation(
                         SharedPreferenceUtils.savePreference(context, user.id, user.role)
 
                         val homeDestination = if (role == Role.ADMIN) {
-                            RouteScreen.CreateEvent
+                            RouteScreen.HomeAdmin
                         } else {
                             RouteScreen.Home
                         }
@@ -71,8 +71,6 @@ fun Navigation(
                             popUpTo(RouteScreen.Login) { inclusive = true } // Elimina la pantalla de Login de la pila
                         }
                     }
-
-
                 },
                 onNavigationToSignUp = {
                     navController.navigate(RouteScreen.Registration)
@@ -99,7 +97,8 @@ fun Navigation(
                 onNavigationToCreateEvent = {
                     navController.navigate(RouteScreen.CreateEvent)
                 },
-                eventsViewModel = eventsViewModel
+                eventsViewModel = eventsViewModel,
+                navController = navController
             )
         }
 
