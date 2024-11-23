@@ -1,13 +1,21 @@
 package com.unieventos.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.unieventos.model.Coupon
+import com.unieventos.model.Event
 import com.unieventos.utils.RequestResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class CouponsViewModel : ViewModel() {
+
+    val db = Firebase.firestore
 
     // StateFlow para mantener la lista de cupones
     private val _coupons = MutableStateFlow(emptyList<Coupon>())
@@ -18,27 +26,57 @@ class CouponsViewModel : ViewModel() {
 
 
     init {
-        _coupons.value = getCouponsList()
+    loadCoupons()
     }
 
     // Crear un nuevo cupón
     fun createCoupon(coupon: Coupon) {
-        _coupons.value += coupon
+
+        viewModelScope.launch {
+            db.collection("coupons")
+                .add(coupon)
+                .await()
+            loadCoupons()
+
+            _coupons.value = getCouponsList()
+
+        }
+    }
+
+    fun loadCoupons(){
+        viewModelScope.launch {
+            _coupons.value = getCouponsList()
+        }
     }
 
     // Eliminar un cupón de la lista
-    fun deleteCoupon(coupon: Coupon) {
-        _coupons.value -= coupon
+    fun deleteCoupon(couponId: String) {
+        viewModelScope.launch{
+            db.collection("coupons")
+                .document(couponId)
+                .delete()
+                .await()
+
+            _coupons.value = getCouponsList()
+
+        }
     }
 
     // Buscar un cupón por su ID
-    fun findCouponById(id: String): Coupon? {
-        return _coupons.value.find { it.id == id }
+    suspend fun findCouponById(id: String): Coupon? {
+        val snapshot = db.collection("coupons")
+            .document(id)
+            .get()
+            .await()
+
+        val coupon = snapshot.toObject(Coupon::class.java)
+        coupon?.id = snapshot.id
+        return coupon
     }
 
     // Buscar cupones que coincidan con el nombre
     fun searchCoupons(query: String): List<Coupon> {
-        return _coupons.value.filter { it.name.contains(query, ignoreCase = true) }
+        return listOf()
     }
 
     fun resetCouponCreationResult(){
@@ -46,8 +84,21 @@ class CouponsViewModel : ViewModel() {
 
     }
 
+    private suspend fun getCouponsList(): List<Coupon> {
+        val snapshot = db.collection("coupons")
+            .get()
+            .await()
 
-    fun getCouponsList(): List<Coupon> {
+        return snapshot.documents.mapNotNull {
+            val coupon = it.toObject(Coupon::class.java)
+            requireNotNull(coupon)
+            coupon.id = it.id
+            coupon
+        }
+    }
+
+
+ /*   fun getCouponsList(): List<Coupon> {
         return listOf(
             Coupon(
                 id = "1",
@@ -74,5 +125,5 @@ class CouponsViewModel : ViewModel() {
                 expiryDate = "2024-12-24"
             )
         )
-    }
+    }*/
 }

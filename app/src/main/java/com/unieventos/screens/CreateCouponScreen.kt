@@ -24,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,9 +46,12 @@ import kotlinx.coroutines.delay
 @Composable
 fun CreateCouponScreen(
     onNavigationBack: () -> Unit,
-    couponsViewModel: CouponsViewModel
+    couponsViewModel: CouponsViewModel,
+    couponId: String? = null
 ) {
     val context = LocalContext.current
+
+    var coupon: Coupon? by remember { mutableStateOf(null) }
 
     var name by rememberSaveable { mutableStateOf("") }
     var discount by rememberSaveable { mutableStateOf("") }
@@ -60,9 +64,17 @@ fun CreateCouponScreen(
 
     val couponCreationResult by couponsViewModel.couponCreationResult.collectAsState()
 
-    LaunchedEffect(name, discount, expiryDate, isDiscountValid) {
-        isFormValid = name.isNotBlank() && isDiscountValid && expiryDate.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))
+    if (couponId != null) {
+//        text = stringResource(R.string.editLabel)
+//        LaunchedEffect(name, discount, expiryDate, isDiscountValid) {
+//            isFormValid = name.isNotBlank() && isDiscountValid && expiryDate.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))
+//        }
+        LaunchedEffect(couponId) {
+            coupon = couponsViewModel.findCouponById(couponId)
+        }
     }
+
+
 
     Scaffold { padding ->
         Column(
@@ -122,7 +134,6 @@ fun CreateCouponScreen(
                 onClick = {
                     couponsViewModel.createCoupon(
                         Coupon(
-                            id = "", // Se generará automáticamente
                             name = name,
                             discount = discount.toDouble(),
                             expiryDate = expiryDate

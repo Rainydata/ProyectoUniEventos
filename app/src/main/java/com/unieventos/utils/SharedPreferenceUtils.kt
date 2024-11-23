@@ -10,7 +10,7 @@ object SharedPreferenceUtils {
 
         val sharedPreferences = context.getSharedPreferences("sesion",Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putString("idUser", idUser)
+        editor.putString("sesion", idUser)
         editor.putString("rol", rol.name)
         editor.apply()
     }
@@ -25,13 +25,13 @@ object SharedPreferenceUtils {
 
     fun getCurrentUser(context: Context): UserDTO?{
         val sharedPreferences = context.getSharedPreferences("sesion",Context.MODE_PRIVATE)
-        val cedula = sharedPreferences.getString("sesion", "")
+        val idUser = sharedPreferences.getString("sesion", "")
         val rol = sharedPreferences.getString("rol", "")
 
-        return if(cedula.isNullOrEmpty() || rol.isNullOrEmpty()){
+        return if(idUser.isNullOrEmpty() || rol.isNullOrEmpty()){
              null
         }else{
-        return UserDTO(cedula, Role.valueOf(rol))
+        return UserDTO(idUser, Role.valueOf(rol))
         }
 
 }}

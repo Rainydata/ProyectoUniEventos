@@ -91,6 +91,9 @@ fun Navigation(
                 onNavigationToEditProfile = {
                     navController.navigate(RouteScreen.EditProfile)
                 },
+                onNavigationToCouponScreen={
+                 navController.navigate(RouteScreen.CouponScreen)
+                },
                 onNavigationToCreateCoupon = {
                     navController.navigate(RouteScreen.CreateCoupon)
                 },
@@ -167,6 +170,12 @@ fun Navigation(
                 onNavigateBack = {
                     navController.popBackStack()
                 }
+            )
+        }
+
+        composable<RouteScreen.CouponScreen> { // Agregar este bloque
+            CouponScreen(
+                onNavigationToCreateCoupon = { navController.navigate(RouteScreen.CreateCoupon) }
             )
         }
 

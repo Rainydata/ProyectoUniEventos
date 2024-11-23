@@ -49,7 +49,6 @@ class UsersViewModel: ViewModel() {
 
         val userSave = user.copy(id = userId, password = "")
 
-        //TODO no guardar la contraseña
         db.collection("users")
             .document(userId)
             .set(userSave)

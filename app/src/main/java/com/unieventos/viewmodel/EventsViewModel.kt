@@ -38,6 +38,7 @@ class EventsViewModel: ViewModel() {
             requireNotNull(event)
             event.id = it.id
             event
+
         }
     }
 

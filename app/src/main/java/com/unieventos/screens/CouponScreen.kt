@@ -87,7 +87,7 @@ fun CouponScreen(
                 LazyColumn {
                     items(filteredCoupons) { coupon ->
                         CouponItem(coupon = coupon, onDelete = {
-                            couponsViewModel.deleteCoupon(coupon)
+                            couponsViewModel.deleteCoupon(coupon.id)
                         })
                     }
                 }

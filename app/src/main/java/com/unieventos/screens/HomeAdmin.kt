@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.unieventos.navigation.RouteScreen
 import com.unieventos.viewmodel.EventsViewModel
 
 
@@ -28,6 +29,7 @@ fun HomeAdmin(
     onNavigationToCreateCoupon: () -> Unit,
     onNavigationToEventDetail: (String) -> Unit,
     onNavigationToCreateEvent: () -> Unit,
+    onNavigationToCouponScreen: () -> Unit,
     eventsViewModel: EventsViewModel,
     navController: NavController
 ) {
@@ -100,7 +102,7 @@ fun BottomBarHomeAdmin(navController: NavController) {
                 )
             },
             onClick = {
-                navController.navigate("events") // Navegar a la pantalla de eventos
+                navController.navigate(RouteScreen.CreateEvent) // Navegar a la pantalla de eventos
             },
             label = {
                 Text(text = "Eventos")
@@ -115,7 +117,7 @@ fun BottomBarHomeAdmin(navController: NavController) {
                 )
             },
             onClick = {
-                navController.navigate("coupons") // Navegar a la pantalla de cupones
+                navController.navigate(RouteScreen.CouponScreen) // Navegar a la pantalla de cupones
             },
             label = {
                 Text(text = "Cupones")
@@ -130,7 +132,7 @@ fun BottomBarHomeAdmin(navController: NavController) {
                 )
             },
             onClick = {
-                navController.navigate("profile") // Navegar a la pantalla de perfil
+                navController.navigate(RouteScreen.EditProfile) // Navegar a la pantalla de perfil
             },
             label = {
                 Text(text = "Perfil")
