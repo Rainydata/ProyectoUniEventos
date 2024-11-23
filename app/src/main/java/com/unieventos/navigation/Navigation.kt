@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.unieventos.model.Role
 import com.unieventos.screens.CreateCouponScreen
+import com.unieventos.screens.CreateEventScreen
 import com.unieventos.screens.EditProfileScreen
 import com.unieventos.screens.EventDetailScreen
 import com.unieventos.screens.HomeAdmin
@@ -188,6 +189,12 @@ fun Navigation(
                 couponsViewModel = couponsViewModel
             )
         }
+
+//        composable<RouteScreen.CreateEvent> {
+//            CreateEventScreen(
+//                onNavigationBack = { navController.popBackStack() }
+//            )
+//        }
     }
 }
 

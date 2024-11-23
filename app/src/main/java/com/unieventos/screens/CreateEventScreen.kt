@@ -22,10 +22,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.unieventos.model.Event
+import com.unieventos.viewmodel.EventsViewModel
 
 @Composable
 fun CreateEventScreen(
-    onEventCreated: (Event) -> Unit
+    onEventCreated: (Event) -> Unit,
+    onNavigationBack: () -> Unit,
+    eventsViewModel: EventsViewModel
 ) {
     // States for event fields
     val title = remember { mutableStateOf("") }

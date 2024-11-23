@@ -74,6 +74,11 @@ fun CreateCouponScreen(
         }
     }
 
+    LaunchedEffect(name, discount, expiryDate, isDiscountValid) {
+        isFormValid = name.isNotBlank() && isDiscountValid &&
+                expiryDate.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))
+    }
+
 
 
     Scaffold { padding ->
