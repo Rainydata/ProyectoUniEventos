@@ -28,7 +28,10 @@ import com.unieventos.viewmodel.CouponsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CouponScreen(couponsViewModel: CouponsViewModel = viewModel()) {
+fun CouponScreen(
+    onNavigationBack: () -> Unit,
+    couponsViewModel: CouponsViewModel = viewModel(),
+) {
     // Obtener el estado de los cupones desde el ViewModel
     val coupons by couponsViewModel.coupons.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
@@ -121,5 +124,5 @@ fun CouponItem(coupon: Coupon, onDelete: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun CouponScreenPreview() {
-    CouponScreen()
+//    CouponScreen()
 }

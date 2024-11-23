@@ -19,6 +19,7 @@ fun HomeAdmin(
     onNavigationToEditProfile: () -> Unit,
     onNavigationToCreateCoupon: () -> Unit,
     onNavigationToEventDetail: (String) -> Unit,
+    onNavigationToCreateEvent: () -> Unit,
     eventsViewModel: EventsViewModel
 ) {
 
@@ -48,14 +49,14 @@ fun HomeAdmin(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
-                    onClick = { /* Lógica para gestionar eventos */ },
+                    onClick = { onNavigationToCreateEvent },
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(text = "Gestionar Eventos")
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
-                    onClick = { /* Lógica para crear nuevos cupones */ },
+                    onClick = { onNavigationToCreateCoupon },
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(text = "Crear Cupones")

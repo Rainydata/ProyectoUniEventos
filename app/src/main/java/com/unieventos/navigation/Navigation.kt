@@ -17,6 +17,7 @@ import com.unieventos.screens.RecoverNewPassScreen
 import com.unieventos.screens.loginScreen
 import com.unieventos.screens.SignUpScreen
 import com.unieventos.screens.RecoverPassScreen
+import com.unieventos.ui.screen.CouponScreen
 import com.unieventos.utils.SharedPreferenceUtils
 import com.unieventos.viewmodel.EventsViewModel
 import com.unieventos.viewmodel.UsersViewModel
@@ -51,7 +52,7 @@ fun Navigation(
             loginScreen(
                 onNavigationToHome = { role ->
                     val homeDestination = if (role == Role.ADMIN) {
-                        RouteScreen.HomeAdmin
+                        RouteScreen.CreateEvent
                     } else {
                         RouteScreen.Home
                     }
@@ -74,16 +75,20 @@ fun Navigation(
             HomeAdmin(
                 onNavigationToEditProfile = {
                     navController.navigate(RouteScreen.EditProfile)
-                    },
+                },
                 onNavigationToCreateCoupon = {
                     navController.navigate(RouteScreen.CreateCoupon)
-                    },
+                },
                 onNavigationToEventDetail = { eventId ->
                     navController.navigate(RouteScreen.EventDetail(eventId))
-                          },
+                },
+                onNavigationToCreateEvent = {
+                    navController.navigate(RouteScreen.CreateEvent)
+                },
                 eventsViewModel = eventsViewModel
             )
         }
+
 
         // Pantalla de Home (para usuarios normales)
         composable<RouteScreen.Home> {
@@ -149,14 +154,14 @@ fun Navigation(
             )
         }
 
-        // Pantalla para crear cupones
-        //composable<RouteScreen.CreateCoupon> {
-          //  CreateCouponScreen(
-            //    onNavigationBack = {
-              //      navController.popBackStack()
-                //}
-            //)
-        //}
+//         Pantalla para crear cupones
+        composable<RouteScreen.CreateCoupon> {
+            CouponScreen(
+                onNavigationBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
     }
 }
 

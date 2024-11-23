@@ -1,7 +1,7 @@
 package com.unieventos.model
 
 data class User(
-
+    var id: String = "",
     val cedula: String,
     val name: String,
     val address: String,
