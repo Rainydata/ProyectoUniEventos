@@ -7,6 +7,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -24,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.unieventos.model.Coupon
 import com.unieventos.viewmodel.CouponsViewModel
+import androidx.compose.material3.Button
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,21 +46,47 @@ fun CouponScreen(
         couponsViewModel.searchCoupons(searchQuery)
     }
 
+    // Variables para el formulario de cupón
+    var editingCoupon by remember { mutableStateOf<Coupon?>(null) }
+    var couponName by remember { mutableStateOf("") }
+    var couponDiscount by remember { mutableStateOf(0.0) }
+    var couponExpiryDate by remember { mutableStateOf("") }
+
+    // Funcion para crear o actualizar un cupón
+    fun onSaveCoupon() {
+        if (editingCoupon != null) {
+            // Actualizar cupón existente
+            val updatedCoupon = editingCoupon!!.copy(name = couponName, discount = couponDiscount, expiryDate = couponExpiryDate)
+            couponsViewModel.createCoupon(updatedCoupon)
+        } else {
+            // Crear un nuevo cupón
+            couponsViewModel.createCoupon(
+                Coupon(
+                    id = coupons.size + 1,
+                    name = couponName,
+                    discount = couponDiscount,
+                    expiryDate = couponExpiryDate
+                )
+            )
+        }
+        // Limpiar el formulario
+        editingCoupon = null
+        couponName = ""
+        couponDiscount = 0.0
+        couponExpiryDate = ""
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Cupones") })
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                // Crear un nuevo cupón al presionar el botón
-                couponsViewModel.createCoupon(
-                    Coupon(
-                        id = coupons.size + 1,
-                        name = "Nuevo Cupón",
-                        discount = 10.0,
-                        expiryDate = "2025-12-31"
-                    )
-                )
+                // Limpiar el formulario para crear un nuevo cupón
+                editingCoupon = null
+                couponName = ""
+                couponDiscount = 0.0
+                couponExpiryDate = ""
             }) {
                 Icon(Icons.Default.Add, contentDescription = "Agregar Cupón")
             }
@@ -80,11 +109,60 @@ fun CouponScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Formulario de agregar o editar cupón
+            Column(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = couponName,
+                    onValueChange = { couponName = it },
+                    label = { Text("Nombre del Cupón") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = couponDiscount.toString(),
+                    onValueChange = { couponDiscount = it.toDoubleOrNull() ?: 0.0 },
+                    label = { Text("Descuento (%)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = couponExpiryDate,
+                    onValueChange = { couponExpiryDate = it },
+                    label = { Text("Fecha de Vencimiento") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Botón para guardar el cupón
+                Button(
+                    onClick = { onSaveCoupon() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = if (editingCoupon != null) "Actualizar Cupón" else "Agregar Cupón")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             // Lista de cupones
             LazyColumn {
                 items(filteredCoupons) { coupon ->
                     CouponItem(coupon = coupon, onDelete = {
                         couponsViewModel.deleteCoupon(coupon)
+                    }, onEdit = {
+                        // Cargar los datos del cupón seleccionado en el formulario para editarlo
+                        editingCoupon = coupon
+                        couponName = coupon.name
+                        couponDiscount = coupon.discount
+                        couponExpiryDate = coupon.expiryDate
                     })
                 }
             }
@@ -93,12 +171,11 @@ fun CouponScreen(
 }
 
 @Composable
-fun CouponItem(coupon: Coupon, onDelete: () -> Unit) {
+fun CouponItem(coupon: Coupon, onDelete: () -> Unit, onEdit: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-
     ) {
         Row(
             modifier = Modifier
@@ -111,18 +188,15 @@ fun CouponItem(coupon: Coupon, onDelete: () -> Unit) {
                 Text(text = "Descuento: ${coupon.discount}%")
                 Text(text = "Vencimiento: ${coupon.expiryDate}")
             }
-            IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Delete, contentDescription = "Eliminar Cupón")
+            Row {
+                IconButton(onClick = onEdit) {
+                    Icon(Icons.Default.Edit, contentDescription = "Editar Cupón")
+                }
+                IconButton(onClick = onDelete) {
+                    Icon(Icons.Default.Delete, contentDescription = "Eliminar Cupón")
+                }
             }
         }
     }
 }
 
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun CouponScreenPreview() {
-//    CouponScreen()
-}
