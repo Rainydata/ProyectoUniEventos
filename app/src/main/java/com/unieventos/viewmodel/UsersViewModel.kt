@@ -25,6 +25,9 @@ class UsersViewModel: ViewModel() {
     private val _authResult = MutableStateFlow<RequestResult?>(null)
     val authResult: StateFlow<RequestResult?> = _authResult.asStateFlow()
 
+    private val _currentUser = MutableStateFlow<User?>(null)
+    val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
+
     init {
         _users.value = getUsersList()
     }
@@ -53,25 +56,39 @@ class UsersViewModel: ViewModel() {
             .await()
     }
 
-    fun login(email: String, password: String): User?{
+    fun login(email: String, password: String){
         viewModelScope.launch{
-            loginFirebase(email, password)
+            _authResult.value = RequestResult.Loading
+            _authResult.value = kotlin.runCatching { loginFirebase(email, password)  }
+                .fold(
+                    onSuccess = {RequestResult.Success("Inició de sesión correcto")},
+                    onFailure = {RequestResult.Failure(it.message.toString())}
+                )
         }
-        return null
-    }
+
+        }
+
 
     private suspend fun loginFirebase(email: String, password: String){
         val response = auth.signInWithEmailAndPassword(email, password).await()
         val userId = response.user?.uid ?: throw Exception("No se pudo iniciar sesión")
+
+        val user = getUserById(userId)
+        _currentUser.value = user
+
     }
 
     fun deleteUser(userId: String) {
         viewModelScope.launch{
-            deleteUserFirebase(userId)
+            _authResult.value = RequestResult.Loading
+            _authResult.value = kotlin.runCatching { deleteUserFirebase(userId) }
+                .fold(
+                    onSuccess = {RequestResult.Success("Usuario eliminado exitosamente")},
+                    onFailure = {RequestResult.Failure(it.message.toString())}
+                )
         }
 
-    }
-
+        }
 
     private suspend fun deleteUserFirebase(userId: String) {
     db.collection("users")
@@ -83,6 +100,14 @@ class UsersViewModel: ViewModel() {
     fun resetAuthResult(){
         _authResult.value = null
 
+    }
+
+    private suspend fun getUserById(userId: String): User? {
+        return db.collection("users")
+            .document(userId)
+            .get()
+            .await()
+            .toObject(User::class.java)
     }
 
     private fun getUsersList():List<User>{

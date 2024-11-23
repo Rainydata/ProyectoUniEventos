@@ -1,6 +1,8 @@
 package com.unieventos.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -28,6 +30,8 @@ fun Navigation(
     usersViewModel: UsersViewModel,
     eventsViewModel: EventsViewModel
 ) {
+
+    val currentUser by usersViewModel.currentUser.collectAsState()
     val navController = rememberNavController()
     val context = LocalContext.current
     var startDestination: RouteScreen = RouteScreen.Login
@@ -50,15 +54,25 @@ fun Navigation(
         // Pantalla de Login
         composable<RouteScreen.Login> {
             loginScreen(
-                onNavigationToHome = { role ->
-                    val homeDestination = if (role == Role.ADMIN) {
-                        RouteScreen.CreateEvent
-                    } else {
-                        RouteScreen.Home
+                onNavigationToHome = {
+
+                    val user = currentUser
+
+                    if(user!= null){
+                        val role = user.role
+                        SharedPreferenceUtils.savePreference(context, user.id, user.role)
+
+                        val homeDestination = if (role == Role.ADMIN) {
+                            RouteScreen.CreateEvent
+                        } else {
+                            RouteScreen.Home
+                        }
+                        navController.navigate(homeDestination) {
+                            popUpTo(RouteScreen.Login) { inclusive = true } // Elimina la pantalla de Login de la pila
+                        }
                     }
-                    navController.navigate(homeDestination) {
-                        popUpTo(RouteScreen.Login) { inclusive = true } // Elimina la pantalla de Login de la pila
-                    }
+
+
                 },
                 onNavigationToSignUp = {
                     navController.navigate(RouteScreen.Registration)

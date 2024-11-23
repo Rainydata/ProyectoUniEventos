@@ -6,11 +6,11 @@ import com.unieventos.model.Role
 
 object SharedPreferenceUtils {
 
-    fun savePreference(context: Context, cedula: String, rol: Role){
+    fun savePreference(context: Context, idUser: String, rol: Role){
 
         val sharedPreferences = context.getSharedPreferences("sesion",Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putString("sesion", cedula)
+        editor.putString("idUser", idUser)
         editor.putString("rol", rol.name)
         editor.apply()
     }
