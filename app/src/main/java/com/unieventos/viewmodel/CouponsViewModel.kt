@@ -40,11 +40,11 @@ class CouponsViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val newCouponRef = db.collection("coupons").document()
-                coupon.id = newCouponRef.id.toInt()  // Si deseas usar un ID autogenerado
+                coupon.id = newCouponRef.id.toInt()
                 newCouponRef.set(coupon).await()
-                fetchCoupons()  // Recargar la lista de cupones después de agregar uno nuevo
+                fetchCoupons()
             } catch (e: Exception) {
-                // Manejo de errores
+
             }
         }
     }
@@ -55,7 +55,7 @@ class CouponsViewModel : ViewModel() {
             try {
                 val couponRef = db.collection("coupons").document(coupon.id.toString())
                 couponRef.delete().await()
-                fetchCoupons()  // Recargar la lista después de eliminar un cupón
+                fetchCoupons()
             } catch (e: Exception) {
                 // Manejo de errores
             }
