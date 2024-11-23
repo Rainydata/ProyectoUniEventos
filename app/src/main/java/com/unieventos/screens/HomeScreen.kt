@@ -10,6 +10,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Logout
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -17,9 +20,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import com.unieventos.model.Event
 import com.unieventos.utils.SharedPreferenceUtils
 import com.unieventos.viewmodel.EventsViewModel
@@ -32,28 +38,24 @@ import dev.chrisbanes.haze.hazeChild
 @Composable
 fun HomeScreen(
     onNavigationToEditProfile: () -> Unit,
-    onNavigationToEventDetail:(String) -> Unit,
+    onNavigationToEventDetail: (String) -> Unit,
     eventsViewModel: EventsViewModel
-
-){
-
-    val hazeState = remember{ HazeState() }
-    val events = eventsViewModel.events.collectAsState()
+) {
+    // Estado de los eventos desde el ViewModel
+    val events by eventsViewModel.events.collectAsState()
+    val hazeState = remember { HazeState() }
 
     Scaffold(
         topBar = {
-            TopBarHome(
-                hazeState= hazeState
-            )
+            TopBarHome(hazeState = hazeState)
         }
-    ) {
-            paddingValues ->
-            EventsList(
-                events= events.value,
-                onNavigationToEventDetail = onNavigationToEventDetail,
-                paddingValues= paddingValues,
-                hazeState = hazeState
-            )
+    ) { paddingValues ->
+        EventsList(
+            events = events,
+            onNavigationToEventDetail = onNavigationToEventDetail,
+            paddingValues = paddingValues,
+            hazeState = hazeState
+        )
     }
 }
 
@@ -61,44 +63,41 @@ fun HomeScreen(
 @Composable
 fun TopBarHome(
     hazeState: HazeState
-){
+) {
     val context = LocalContext.current
 
-CenterAlignedTopAppBar(
-    colors = TopAppBarDefaults.largeTopAppBarColors(Color.Transparent),
-    modifier = Modifier.hazeChild(state =hazeState),
-    actions = {
-        IconButton(onClick = {
-            SharedPreferenceUtils.clearPreference(context)
-        }) {
-            Icon(imageVector = Icons.AutoMirrored.Rounded.Logout, contentDescription = null)
-        }
-    },
-    title = {
-    Text(text = "UniEventos")
-},
-)
+    CenterAlignedTopAppBar(
+        colors = TopAppBarDefaults.largeTopAppBarColors(Color.Transparent),
+        modifier = Modifier.hazeChild(state = hazeState),
+        actions = {
+            IconButton(onClick = {
+                SharedPreferenceUtils.clearPreference(context)
+            }) {
+                Icon(imageVector = Icons.AutoMirrored.Rounded.Logout, contentDescription = null)
+            }
+        },
+        title = {
+            Text(text = "UniEventos")
+        },
+    )
 }
 
 @Composable
 fun EventsList(
     events: List<Event>,
-    paddingValues : PaddingValues,
+    paddingValues: PaddingValues,
     onNavigationToEventDetail: (String) -> Unit,
     hazeState: HazeState
-    ){
-
+) {
     LazyColumn(
         modifier = Modifier
             .haze(
                 state = hazeState,
                 style = HazeDefaults.style(backgroundColor = MaterialTheme.colorScheme.surface)
-            )
-        ,
+            ),
         contentPadding = paddingValues
     ) {
-        items( events ){
-            event ->
+        items(events) { event ->
             ItemEvento(
                 event = event,
                 onNavigationToEventDetail = onNavigationToEventDetail
@@ -106,6 +105,36 @@ fun EventsList(
         }
     }
 }
+
+@Composable
+fun ItemEvento(
+    event: Event,
+    onNavigationToEventDetail: (String) -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        elevation = CardDefaults.cardElevation()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(text = "Nombre: ${event.title}", style = MaterialTheme.typography.bodyMedium)
+                Text(text = "Fecha: ${event.date}", style = MaterialTheme.typography.bodyMedium)
+            }
+            IconButton(onClick = { onNavigationToEventDetail(event.id) }) {
+                Icon(Icons.Default.ArrowForward, contentDescription = "Ver Detalles del Evento")
+            }
+        }
+    }
+}
+
 
 
 //@Composable
