@@ -1,12 +1,10 @@
 package com.unieventos.screens
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -24,118 +22,190 @@ import androidx.compose.runtime.remember
 import com.unieventos.model.Event
 import com.unieventos.viewmodel.EventsViewModel
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import com.unieventos.utils.RequestResult
+import kotlinx.coroutines.delay
+
+
 @Composable
 fun CreateEventScreen(
-    onEventCreated: (Event) -> Unit,
     onNavigationBack: () -> Unit,
-    eventsViewModel: EventsViewModel
+    eventsViewModel: EventsViewModel,
+    eventId: String? = null
 ) {
-    // States for event fields
-    val title = remember { mutableStateOf("") }
-    val place = remember { mutableStateOf("") }
-    val city = remember { mutableStateOf("") }
-    val date = remember { mutableStateOf("") }
-    val time = remember { mutableStateOf("") }
-    val category = remember { mutableStateOf("") }
-    val address = remember { mutableStateOf("") }
-    val opening = remember { mutableStateOf("") }
-    val image = remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    var event: Event? by remember { mutableStateOf(null) }
+
+    var title by rememberSaveable { mutableStateOf("") }
+    var place by rememberSaveable { mutableStateOf("") }
+    var city by rememberSaveable { mutableStateOf("") }
+    var date by rememberSaveable { mutableStateOf("") }
+    var time by rememberSaveable { mutableStateOf("") }
+    var category by rememberSaveable { mutableStateOf("") }
+    var address by rememberSaveable { mutableStateOf("") }
+    var opening by rememberSaveable { mutableStateOf("") }
+    var image by rememberSaveable { mutableStateOf("") }
+
+    var isFormValid by rememberSaveable { mutableStateOf(false) }
+
+    val eventCreationResult by eventsViewModel.eventCreationResult.collectAsState()
+
+    if (eventId != null) {
+        LaunchedEffect(eventId) {
+            event = eventsViewModel.findEventById(eventId)
+            event?.let {
+                title = it.title
+                place = it.place
+                city = it.city
+                date = it.date
+                time = it.time
+                category = it.category
+                address = it.address
+                opening = it.opening
+                image = it.image
+            }
+        }
+    }
+
+    LaunchedEffect(title, place, city, date, time, category, address, opening, image) {
+        isFormValid = title.isNotBlank() && place.isNotBlank() && city.isNotBlank() &&
+                date.matches(Regex("\\d{4}-\\d{2}-\\d{2}")) &&
+                time.matches(Regex("\\d{2}:\\d{2}")) &&
+                category.isNotBlank() && address.isNotBlank() &&
+                opening.matches(Regex("\\d+(\\.\\d{1,2})?")) // Valida apertura como un número
+    }
 
     Scaffold { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Screen title
-            Text(
-                text = "Create New Event",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            // Fields for event details
+            // Campo para el título
             EventField(
-                label = "Title",
-                value = title.value,
-                onValueChange = { title.value = it }
+                label = "Título",
+                value = title,
+                onValueChange = { title = it }
             )
+            // Campo para el lugar
             EventField(
-                label = "Place",
-                value = place.value,
-                onValueChange = { place.value = it }
+                label = "Lugar",
+                value = place,
+                onValueChange = { place = it }
             )
+            // Campo para la ciudad
             EventField(
-                label = "City",
-                value = city.value,
-                onValueChange = { city.value = it }
+                label = "Ciudad",
+                value = city,
+                onValueChange = { city = it }
             )
+            // Campo para la fecha
             EventField(
-                label = "Date",
-                value = date.value,
-                onValueChange = { date.value = it }
+                label = "Fecha (YYYY-MM-DD)",
+                value = date,
+                onValueChange = { date = it }
             )
+            // Campo para la hora
             EventField(
-                label = "Time",
-                value = time.value,
-                onValueChange = { time.value = it }
+                label = "Hora (HH:mm)",
+                value = time,
+                onValueChange = { time = it }
             )
+            // Campo para la categoría
             EventField(
-                label = "Category",
-                value = category.value,
-                onValueChange = { category.value = it }
+                label = "Categoría",
+                value = category,
+                onValueChange = { category = it }
             )
+            // Campo para la dirección
             EventField(
-                label = "Address",
-                value = address.value,
-                onValueChange = { address.value = it }
+                label = "Dirección",
+                value = address,
+                onValueChange = { address = it }
             )
+            // Campo para la apertura
             EventField(
-                label = "Opening",
-                value = opening.value,
-                onValueChange = { opening.value = it }
+                label = "Apertura",
+                value = opening,
+                onValueChange = { opening = it }
             )
+            // Campo para la imagen
             EventField(
-                label = "Image (URL)",
-                value = image.value,
-                onValueChange = { image.value = it }
+                label = "Imagen (URL)",
+                value = image,
+                onValueChange = { image = it }
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Button to save the event
+            // Botón para guardar el evento
             Button(
                 onClick = {
-                    // Create event
-                    val newEvent = Event(
-                        id = "", // ID assigned dynamically in ViewModel or database
-                        title = title.value,
-                        place = place.value,
-                        city = city.value,
-                        date = date.value,
-                        time = time.value,
-                        category = category.value,
-                        address = address.value,
-                        opening = opening.value,
-                        image = image.value
+                    eventsViewModel.createEvent(
+                        Event(
+                            id = event?.id ?: "",
+                            title = title,
+                            place = place,
+                            city = city,
+                            date = date,
+                            time = time,
+                            category = category,
+                            address = address,
+                            opening = opening,
+                            image = image
+                        )
                     )
-                    // Call the function to pass the created event
-                    onEventCreated(newEvent)
                 },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00796B))
+                enabled = isFormValid
             ) {
-                Text(text = "Save Event", color = Color.White)
+                Text(text = "Guardar Evento")
+            }
+
+            // Estado del resultado de creación del evento
+            when (eventCreationResult) {
+                is RequestResult.Loading -> {
+                    CircularProgressIndicator()
+                }
+                is RequestResult.Success -> {
+                    Text(
+                        text = (eventCreationResult as RequestResult.Success).message,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    LaunchedEffect(Unit) {
+                        delay(1200)
+                        onNavigationBack()
+                        eventsViewModel.resetEventCreationResult()
+                    }
+                }
+                is RequestResult.Failure -> {
+                    Text(
+                        text = (eventCreationResult as RequestResult.Failure).messageError,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+                null -> {}
             }
         }
     }
 }
+
 
 // Composable for an event field with label and text input
 @Composable

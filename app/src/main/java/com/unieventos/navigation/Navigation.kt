@@ -190,11 +190,14 @@ fun Navigation(
             )
         }
 
-//        composable<RouteScreen.CreateEvent> {
-//            CreateEventScreen(
-//                onNavigationBack = { navController.popBackStack() }
-//            )
-//        }
+        composable<RouteScreen.CreateEvent> {
+            CreateEventScreen(
+                onNavigationBack = {
+                    navController.popBackStack()
+                },
+                eventsViewModel = eventsViewModel
+            )
+        }
     }
 }
 
